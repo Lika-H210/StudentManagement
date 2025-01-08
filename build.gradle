@@ -22,7 +22,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	// Apache Commons Lang
 	implementation 'org.apache.commons:commons-lang3:3.14.0'
-	// mySQLドライバー
+	// MySQLドライバー
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	// MyBatis
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'

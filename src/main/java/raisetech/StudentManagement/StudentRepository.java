@@ -4,6 +4,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,13 +19,19 @@ public interface StudentRepository {
   Student searchByName(String name);
 
   @Insert("INSERT student values(#{name},#{age},#{course})")
-  void registerStudent(String name, int age,String course);
+  void registerStudent(String name, Integer age,String course);
 
-  @Update("UPDATE student SET age = #{age} WHERE name = #{name}")
-  void updateStudentAge(String name, int age);
-
-  @Update("UPDATE student SET course = #{course} WHERE name = #{name}")
-  void updateStudentCourse(String name, String course);
+  @Update("<script>"
+      + "UPDATE student "
+      + "<set>"
+      + "  <if test='age != null'> age = #{age}, </if>"
+      + "  <if test='course != null'> course = #{course}, </if>"
+      + "</set>"
+      + "WHERE name = #{name}"
+      + "</script>")
+  void updateStudent(@Param("name") String name,
+      @Param("age") Integer age,
+      @Param("course") String course);
 
   @Delete("DELETE FROM student WHERE name = #{name}")
   void deleteStudent(String name);

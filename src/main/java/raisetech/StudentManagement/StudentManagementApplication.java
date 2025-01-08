@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,11 +40,9 @@ public class StudentManagementApplication {
 	}
 
 	@GetMapping("/studentInfoTable")
-	public String getStudentList(){
+	public List<Student> getStudentList(){
 		List<Student> students = repository.getStudentList();
-		return students.stream()
-				.map(Student::toString)
-				.collect(Collectors.joining("\n"));
+		return repository.getStudentList();
 	}
 
 	@GetMapping("/studentInfo")
@@ -53,18 +52,27 @@ public class StudentManagementApplication {
 	}
 
 	@PostMapping("/studentInfo")
-	public void registerStudent(String name, int age,String course) {
+	public void registerStudent(String name, Integer age,String course) {
 		repository.registerStudent(name,age,course);
 	}
 
 	@PatchMapping("/studentInfo")
-	public void updateStudentAge(String name, int age) {
-		repository.updateStudentAge(name,age);
-	}
+	public void updateStudent(@RequestBody Student request) {
+		if (request.getName() == null) {
+			throw new IllegalArgumentException("Name is required");
+		}
 
-	@PatchMapping("/studentInfoCourse")
-	public void updateStudentCourse(String name, String course) {
-		repository.updateStudentCourse(name,course);
+		// 現在のデータを取得
+		Student currentStudent = repository.searchByName(request.getName());
+		if (currentStudent == null) {
+			throw new IllegalArgumentException("Student not found");
+		}
+
+		// age や course が null の場合は現在の値を使用
+		Integer updatedAge = request.getAge() != null ? request.getAge() : currentStudent.getAge();
+		String updatedCourse = request.getCourse() != null ? request.getCourse() : currentStudent.getCourse();
+
+		repository.updateStudent(request.getName(), updatedAge, updatedCourse);
 	}
 
 	@DeleteMapping("/studentInfo")

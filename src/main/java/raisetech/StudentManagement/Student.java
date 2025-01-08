@@ -2,7 +2,7 @@ package raisetech.StudentManagement;
 
 public class Student {
   private String name;
-  private int age;
+  private Integer age;
   private String course;
 
   public String getName() {
@@ -13,11 +13,11 @@ public class Student {
     this.name = name;
   }
 
-  public int getAge() {
+  public Integer getAge() {
     return age;
   }
 
-  public void setAge(int age) {
+  public void setAge(Integer age) {
     this.age = age;
   }
 
@@ -29,8 +29,4 @@ public class Student {
     this.course = course;
   }
 
-  @Override
-  public String toString() {
-    return "{" + getName() + ", " + getAge() +  "歳, " + getCourse() + "}";
-  }
 }
