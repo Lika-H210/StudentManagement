@@ -19,12 +19,12 @@ public class StudentManagementApplication {
 		SpringApplication.run(StudentManagementApplication.class, args);
 	}
 
-	@GetMapping("/studentsInfoTable")
+	@GetMapping("/students")
 	public List<Students> getStudentsList(){
 		return repository.getStudentsList();
 	}
 
-	@GetMapping("/studentsCoursesInfoTable")
+	@GetMapping("/studentsCourses")
 	public List<StudentsCourses> getStudensCoursestList(){
 		return repository.getStudentsCoursesList();
 	}
