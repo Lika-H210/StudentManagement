@@ -21,22 +21,12 @@ public class StudentController {
 
   @GetMapping("/studentsList")
   public List<Students> getStudentsList(){
-    List<Students> studentAgeLimitedList = new ArrayList<>();
-    for(Students student : service.searchStudentsList()){
-      if(student.getAge() >= 30 && student.getAge() < 40){
-        studentAgeLimitedList.add(student);
-      }
-    }
-    return studentAgeLimitedList;
+    return service.searchStudentsList();
   }
 
   @GetMapping("/studentsCoursesList")
   public List<String> getStudensCoursestList(){
-    List<String> coursesRelationList = new ArrayList<>();
-    for(StudentsCourses studentCourse : service.searchStudentsCourseList()){
-        coursesRelationList.add("courseId : " + studentCourse.getCourseId() +", course : " + studentCourse.getCourse());
-    }
-    return coursesRelationList;
+    return service.searchStudentsCourseList();
   }
 
 }

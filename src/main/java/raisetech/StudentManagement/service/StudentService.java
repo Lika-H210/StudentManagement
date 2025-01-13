@@ -1,5 +1,6 @@
 package raisetech.StudentManagement.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,21 @@ public class StudentService {
   }
 
   public List<Students> searchStudentsList(){
-    return repository.searchStudents();
+    List<Students> studentAgeLimitedList = new ArrayList<>();
+    for(Students student : repository.searchStudents()){
+      if(student.getAge() >= 30 && student.getAge() < 40){
+        studentAgeLimitedList.add(student);
+      }
+    }
+    return studentAgeLimitedList;
   }
 
-  public List<StudentsCourses> searchStudentsCourseList(){
-    return repository.searchStudentsCourses();
+  public List<String> searchStudentsCourseList(){
+    List<String> coursesRelationList = new ArrayList<>();
+    for(StudentsCourses studentCourse : repository.searchStudentsCourses()){
+      coursesRelationList.add("courseId : " + studentCourse.getCourseId() +", course : " + studentCourse.getCourse());
+    }
+    return coursesRelationList;
   }
 
 }
