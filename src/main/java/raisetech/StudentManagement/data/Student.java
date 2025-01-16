@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Students {
+public class Student {
   //必須：studentId, fullName, fullNameKana
   //studentId:PRIMARY KEY
   private String studentId;
@@ -16,4 +16,7 @@ public class Students {
   private String residenceArea;
   private Integer age;
   private String sex;
+  private String remark;
+  private boolean isDeleted;
+
 }
