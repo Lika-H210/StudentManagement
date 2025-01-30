@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>受講生登録</title>
+</head>
+<body>
+<h1>受講生登録</h1>
+<form th:action="@{/registerStudent}" th:object="${studentDetail}" method="post">
+  <div>
+    <label for="name">※名前:</label><br>
+    <input type="text" id="name" th:field="*{student.fullName}" required/>
+  </div>
+  <div>
+    <label for="kanaName">※カナ:</label><br>
+    <input type="text" id="kanaName" th:field="*{student.fullNameKana}" required/>
+  </div>
+  <div>
+    <label for="nickname">ニックネーム:</label><br>
+    <input type="text" id="nickname" th:field="*{student.nickname}"/>
+  </div>
+  <div>
+    <label for="mailAddress">メールアドレス:</label><br>
+    <input type="text" id="mailAddress" th:field="*{student.mailAddress}"/>
+  </div>
+  <div>
+    <label for="area">お住まい(都道府県 区市町村):</label><br>
+    <input type="text" id="area" th:field="*{student.residenceArea}"/>
+  <div>
+    <label for="age">年齢:</label><br>
+    <input type="text" id="age" th:field="*{student.age}"/>
+  </div>
+  <div>
+    <label for="sex">性別:</label><br>
+    <input type="text" id="sex" th:field="*{student.sex}"/>
+  </div>
+  <div>
+    <label for="remark">備考:</label><br>
+    <input type="text" id="remark" th:field="*{student.remark}"/>
+  </div>
+  <p style="font-size: 0.9em; color: gray;">※は必須項目</p>
+  <h3 style="margin: 20px 0; border-bottom: 1px solid #ddd;">コース情報</h3>
+  <div th:each="course, itemStat : *{studentsCourses}">
+    <label for="course__${itemStat.index}__">コース名:</label><br>
+    <input type="text" id="course__${itemStat.index}__"
+           th:field="*{studentsCourses[__${itemStat.index}__].course}"/>
+  </div>
+
+  <div th:each="course, itemStat : *{studentsCourses}">
+    <label for="courseId__${itemStat.index}__">コースID:</label><br>
+    <input type="text" id="courseId__${itemStat.index}__"
+             th:field="*{studentsCourses[__${itemStat.index}__].courseId}"/>
+  </div>
+  <div th:each="course, itemStat : *{studentsCourses}">
+    <label for="startDate__${itemStat.index}__">開始日:</label><br>
+    <input type="text" id="startDate__${itemStat.index}__"
+             th:field="*{studentsCourses[__${itemStat.index}__].startDate}"/>
+  </div>
+  <div th:each="course, itemStat : *{studentsCourses}">
+    <label for="startDate__${itemStat.index}__">終了日:</label><br>
+    <input type="text" id="endDate__${itemStat.index}__"
+             th:field="*{studentsCourses[__${itemStat.index}__].endDate}"/>
+  </div>
+  <p style="font-size: 0.9em; color: gray;">※コースIDの入力がない場合コースは登録されません。</p><br>
+  <div>
+    <button type="submit">登録</button>
+  </div>
+</form>
+</body>
+</html>
