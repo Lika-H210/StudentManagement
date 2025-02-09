@@ -47,11 +47,6 @@
   </div>
 
   <div th:each="course, itemStat : *{studentsCourses}">
-    <label for="courseId__${itemStat.index}__">コースID:</label><br>
-    <input type="text" id="courseId__${itemStat.index}__"
-             th:field="*{studentsCourses[__${itemStat.index}__].courseId}"/>
-  </div>
-  <div th:each="course, itemStat : *{studentsCourses}">
     <label for="startDate__${itemStat.index}__">開始日:</label><br>
     <input type="text" id="startDate__${itemStat.index}__"
              th:field="*{studentsCourses[__${itemStat.index}__].startDate}"/>
@@ -61,7 +56,7 @@
     <input type="text" id="endDate__${itemStat.index}__"
              th:field="*{studentsCourses[__${itemStat.index}__].endDate}"/>
   </div>
-  <p style="font-size: 0.9em; color: gray;">※コースIDの入力がない場合コースは登録されません。</p><br>
+  <p style="font-size: 0.9em; color: gray;">※コース名の入力がない場合コースは登録されません。</p><br>
   <div>
     <button type="submit">登録</button>
   </div>
