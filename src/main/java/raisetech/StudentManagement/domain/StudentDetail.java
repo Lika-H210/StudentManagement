@@ -12,7 +12,13 @@ import raisetech.StudentManagement.data.StudentsCourses;
 public class StudentDetail {
 
   private Student student;
-  private List<StudentsCourses> studentsCourses = new ArrayList<>();
+  private List<StudentsCourses> studentsCourses;
+
+  public StudentDetail() {
+    this.student = new Student();
+    this.studentsCourses = new ArrayList<>();
+    this.studentsCourses.add(new StudentsCourses());
+  }
 
 }
 

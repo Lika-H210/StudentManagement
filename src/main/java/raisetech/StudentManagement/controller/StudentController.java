@@ -43,13 +43,7 @@ public class StudentController {
 
   @GetMapping("/newStudent")
   public String newStudent(Model model) {
-
     StudentDetail studentDetail = new StudentDetail();
-
-    //studentDetail内のList<StudentsCourses>がnullであるとinput画面が生成されないため
-    //StudentsCourses()を前もって作成しておく
-    studentDetail.getStudentsCourses().add(new StudentsCourses());
-
     model.addAttribute("studentDetail", studentDetail);
     return "registerStudent";
   }
