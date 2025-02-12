@@ -1,5 +1,6 @@
 package raisetech.StudentManagement.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,7 +33,6 @@ public class StudentController {
     List<StudentsCourses> studentsCourses = service.searchStudentsCourseList();
 
     model.addAttribute("studentList", converter.convertStudentDetails(students, studentsCourses));
-
     return "studentList";
   }
 
@@ -43,7 +43,10 @@ public class StudentController {
 
   @GetMapping("/newStudent")
   public String newStudent(Model model) {
-    StudentDetail studentDetail = new StudentDetail();
+    Student student = new Student();
+    List<StudentsCourses> studentsCourses = new ArrayList<>();
+    studentsCourses.add(new StudentsCourses());
+    StudentDetail studentDetail = new StudentDetail(student, studentsCourses);
     model.addAttribute("studentDetail", studentDetail);
     return "registerStudent";
   }

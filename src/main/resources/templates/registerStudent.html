@@ -41,20 +41,18 @@
   <p style="font-size: 0.9em; color: gray;">※は必須項目</p>
   <h3 style="margin: 20px 0; border-bottom: 1px solid #ddd;">コース情報</h3>
   <div th:each="course, itemStat : *{studentsCourses}">
+
     <label for="course__${itemStat.index}__">コース名:</label><br>
     <input type="text" id="course__${itemStat.index}__"
-           th:field="*{studentsCourses[__${itemStat.index}__].course}"/>
-  </div>
+           th:field="*{studentsCourses[__${itemStat.index}__].course}"/><br>
 
-  <div th:each="course, itemStat : *{studentsCourses}">
     <label for="startDate__${itemStat.index}__">開始日:</label><br>
     <input type="text" id="startDate__${itemStat.index}__"
-             th:field="*{studentsCourses[__${itemStat.index}__].startDate}"/>
-  </div>
-  <div th:each="course, itemStat : *{studentsCourses}">
+             th:field="*{studentsCourses[__${itemStat.index}__].startDate}"/><br>
+
     <label for="startDate__${itemStat.index}__">終了日:</label><br>
     <input type="text" id="endDate__${itemStat.index}__"
-             th:field="*{studentsCourses[__${itemStat.index}__].endDate}"/>
+             th:field="*{studentsCourses[__${itemStat.index}__].endDate}"/><br>
   </div>
   <p style="font-size: 0.9em; color: gray;">※コース名の入力がない場合コースは登録されません。</p><br>
   <div>
