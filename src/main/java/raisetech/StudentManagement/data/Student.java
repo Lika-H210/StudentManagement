@@ -6,9 +6,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Student {
+
   //必須：studentId, fullName, fullNameKana
   //studentId:PRIMARY KEY
-  private String studentId;
+  private Integer studentId;
   private String fullName;
   private String fullNameKana;
   private String nickname;
