@@ -47,11 +47,11 @@
            th:field="*{studentsCourses[__${itemStat.index}__].course}"/><br>
 
     <label for="startDate__${itemStat.index}__">開始日:</label><br>
-    <input type="text" id="startDate__${itemStat.index}__"
+    <input type="date" id="startDate__${itemStat.index}__"
              th:field="*{studentsCourses[__${itemStat.index}__].startDate}"/><br>
 
     <label for="startDate__${itemStat.index}__">終了日:</label><br>
-    <input type="text" id="endDate__${itemStat.index}__"
+    <input type="date" id="endDate__${itemStat.index}__"
              th:field="*{studentsCourses[__${itemStat.index}__].endDate}"/><br>
   </div>
   <p style="font-size: 0.9em; color: gray;">※コース名の入力がない場合コースは登録されません。</p><br>

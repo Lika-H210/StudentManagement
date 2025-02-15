@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>受講生情報更新</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<h1>受講生関連情報更新</h1>
+<p>受講生ID: <span th:text="${studentDetail.student.studentId}"></span></p>
+<h3>受講生情報更新</h3>
+<form th:action="@{/updateStudent}" th:object="${studentDetail}" method="post">
+  <!-- studentId を hidden で送信（変更不可） -->
+  <input type="hidden" th:field="*{student.studentId}"/>
+
+  <table class="student-table">
+    <tr>
+      <th style="width: 20%;">登録項目</th>
+      <th style="width: 40%;">現行内容</th>
+      <th style="width: 40%;">更新内容</th>
+    </tr>
+
+    <tr>
+      <td>名前<span class="required-label">必須</span></td>
+      <td><span th:text="${studentDetail.student.fullName}"></span></td>
+      <td class="highlight">
+        <input type="text" th:field="*{student.fullName}" style="width: 95%;" required/>
+      </td>
+    </tr>
+
+    <tr>
+      <td>カナ<span class="required-label">必須</span></td>
+      <td><span th:text="${studentDetail.student.fullNameKana}"></span></td>
+      <td class="highlight">
+        <input type="text" th:field="*{student.fullNameKana}" style="width: 95%;" required/>
+      </td>
+    </tr>
+
+    <tr>
+      <td>ニックネーム</td>
+      <td><span th:text="${studentDetail.student.nickname}"></span></td>
+      <td class="highlight">
+        <input type="text" th:field="*{student.nickname}" style="width: 95%;"/>
+      </td>
+    </tr>
+
+    <tr>
+      <td>メールアドレス</td>
+      <td><span th:text="${studentDetail.student.mailAddress}"></span></td>
+      <td class="highlight">
+        <input type="text" th:field="*{student.mailAddress}" style="width: 95%;"/>
+      </td>
+    </tr>
+
+    <tr>
+      <td>お住まい<br>
+        (都道府県 区市町村)
+      </td>
+      <td><span th:text="${studentDetail.student.residenceArea}"></span></td>
+      <td class="highlight">
+        <input type="text" th:field="*{student.residenceArea}" style="width: 95%;"/>
+      </td>
+    </tr>
+
+    <tr>
+      <td>年齢</td>
+      <td><span th:text="${studentDetail.student.age}"></span></td>
+      <td class="highlight">
+        <input type="text" th:field="*{student.age}" style="width: 95%;"/>
+      </td>
+    </tr>
+
+    <tr>
+      <td>性別</td>
+      <td><span th:text="${studentDetail.student.sex}"></span></td>
+      <td class="highlight">
+        <input type="text" th:field="*{student.sex}" style="width: 95%;"/>
+      </td>
+    </tr>
+
+    <tr>
+      <td>備考</td>
+      <td><span th:text="${studentDetail.student.remark}"></span></td>
+      <td class="highlight">
+        <input type="text" th:field="*{student.remark}" style="width: 95%;"/>
+      </td>
+    </tr>
+
+    <tr>
+      <td>削除フラグ</td>
+      <td>
+        <span
+            th:text="${studentDetail.student.isDeleted} ? '削除済み(チェックあり)' : '有効(チェックなし)'"></span>
+      </td>
+      <td class="highlight">
+        <input type="checkbox" name="isDeleted" th:checked="${studentDetail.student.isDeleted}"/>
+
+        <input type="hidden" name="originalIsDeleted"
+               th:value="${studentDetail.student.isDeleted}"/>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <h3>コース情報更新</h3>
+
+  <table class="course-table">
+    <tr>
+      <th style="width: 20%;">コース名 現行</th>
+      <th style="width: 15%;">開始日 現行</th>
+      <th style="width: 15%;">終了日 現行</th>
+      <th style="width: 20%;">コース名 更新<span class="required-label">必須</span></th>
+      <th style="width: 15%;">開始日 更新</th>
+      <th style="width: 15%;">終了日 更新</th>
+    </tr>
+
+    <tr th:each="course, index : *{studentsCourses}">
+      <input type="hidden" th:field="*{studentsCourses[__${index.index}__].courseId}"/>
+
+      <td><span th:text="${course.course}"></span></td>
+      <td><span th:text="${course.startDate}"></span></td>
+      <td><span th:text="${course.endDate}"></span></td>
+
+      <td class="highlight">
+        <input type="text" th:field="*{studentsCourses[__${index.index}__].course}"
+               style="width: 95%;" required/>
+      </td>
+
+      <td class="highlight">
+        <input type="date" th:field="*{studentsCourses[__${index.index}__].startDate}"
+               style="width: 95%;"/>
+      </td>
+
+      <td class="highlight">
+        <input type="date" th:field="*{studentsCourses[__${index.index}__].endDate}"
+               style="width: 95%;"/>
+      </td>
+    </tr>
+  </table>
+  <br>
+  <div>
+    <button type="submit">更新</button>
+  </div>
+</form>
+</body>
+</html>

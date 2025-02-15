@@ -1,5 +1,6 @@
 package raisetech.StudentManagement.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,13 +20,25 @@ public class StudentService {
     this.repository = repository;
   }
 
-  //リスト全件取得
+  //studentsリスト全件取得
   public List<Student> searchStudentsList() {
     return repository.searchStudents();
   }
 
+  //students_coursesリスト全件取得
   public List<StudentsCourses> searchStudentsCourseList() {
     return repository.searchStudentsCourses();
+  }
+
+  //student 1件取得
+  public StudentDetail searchStudent(Integer studentId) {
+    Student student = new Student();
+    List<StudentsCourses> studentsCourses = new ArrayList<>();
+    studentsCourses.add(new StudentsCourses());
+    StudentDetail studentDetail = new StudentDetail(student, studentsCourses);
+    studentDetail.setStudent(repository.searchStudentsByStudentId(studentId));
+    studentDetail.setStudentsCourses(repository.searchStudentsCoursesByStudentId(studentId));
+    return studentDetail;
   }
 
   // 新規生徒情報登録 (DB:studentsへの登録　補：courseの入力がある場合はstudents_coursesも登録)
@@ -49,4 +62,17 @@ public class StudentService {
       repository.registerStudentCourse(studentsCourses);
     }
   }
+
+  //生徒情報とコース情報の更新
+  @Transactional
+  public void updateStudentDetail(StudentDetail studentDetail) {
+    repository.updateStudent(studentDetail.getStudent());
+
+    for (StudentsCourses course : studentDetail.getStudentsCourses()) {
+      repository.updateStudentCourse(course);
+    }
+  }
+
+
 }
+
