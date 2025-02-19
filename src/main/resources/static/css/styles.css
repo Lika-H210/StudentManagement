@@ -55,11 +55,16 @@
   background-color: #ffffe0;
 }
 
+/* 補足説明　文字サイズダウン */
+.explanation {
+  font-size: 80%;
+}
+
 /* 必須項目ラベル（縁取り付き） */
 .required-label {
   color: red;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 80%;
   margin-left: 5px;
   text-shadow:
     -0.5px -0.5px 0 white,  /* 左上 */

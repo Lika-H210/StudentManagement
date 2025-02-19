@@ -87,16 +87,11 @@
     </tr>
 
     <tr>
-      <td>削除フラグ</td>
-      <td>
-        <span
-            th:text="${studentDetail.student.isDeleted} ? '削除済み(チェックあり)' : '有効(チェックなし)'"></span>
-      </td>
+      <td>キャンセル</td>
+      <td></td>
       <td class="highlight">
-        <input type="checkbox" name="isDeleted" th:checked="${studentDetail.student.isDeleted}"/>
-
-        <input type="hidden" name="originalIsDeleted"
-               th:value="${studentDetail.student.isDeleted}"/>
+        <input type="checkbox" name="isDeleted" th:field="${studentDetail.student.isDeleted}"/>
+        <span class="explanation">(チェックをつけるとキャンセルされます)</span>
       </td>
     </tr>
   </table>
