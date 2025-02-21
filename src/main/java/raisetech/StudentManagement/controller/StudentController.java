@@ -32,7 +32,6 @@ public class StudentController {
   public String getStudentsList(Model model) {
     List<Student> students = service.searchStudentsList();
     List<StudentsCourses> studentsCourses = service.searchStudentsCourseList();
-
     model.addAttribute("studentList", converter.convertStudentDetails(students, studentsCourses));
     return "studentList";
   }
