@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import raisetech.StudentManagement.data.Student;
-import raisetech.StudentManagement.data.StudentsCourses;
+import raisetech.StudentManagement.data.StudentCourse;
 
 /**
  * Repository: 受講生 (`students`) および受講コース (`students_courses`) テーブルへのアクセスを提供するリポジトリ。
@@ -30,7 +30,7 @@ public interface StudentRepository {
    * @return 受講コースの一覧(全件)
    */
   @Select("SELECT * FROM students_courses")
-  List<StudentsCourses> searchStudentsCourses();
+  List<StudentCourse> searchStudentsCourses();
 
   /**
    * 指定された `studentId` に紐づく受講生情報を取得します。
@@ -39,7 +39,7 @@ public interface StudentRepository {
    * @return 受講生IDと紐づく受講生情報を取得
    */
   @Select("SELECT * FROM students WHERE student_id = #{studentId}")
-  Student searchStudentsByStudentId(Integer studentId);
+  Student searchStudentByStudentId(Integer studentId);
 
   /**
    * 指定された `studentId` に紐づく受講コース情報を取得します。
@@ -48,10 +48,10 @@ public interface StudentRepository {
    * @return 受講生IDと紐づく全ての受講コース情報を取得
    */
   @Select("SELECT * FROM students_courses WHERE student_id = #{studentId}")
-  List<StudentsCourses> searchStudentsCoursesByStudentId(Integer studentId);
+  List<StudentCourse> searchStudentCoursesByStudentId(Integer studentId);
 
   /**
-   * 受講生情報を新規登録します。
+   * 受講生情報を新規登録します。 student_idは自動採番されます。
    *
    * @param student 登録する受講生情報
    */
@@ -63,7 +63,7 @@ public interface StudentRepository {
   void registerStudent(Student student);
 
   /**
-   * 受講コース情報を新規登録します。
+   * 受講コース情報を新規登録します。 course_idは自動採番されます。
    *
    * @param studentsCourses 登録する受講コース情報
    */
@@ -72,7 +72,7 @@ public interface StudentRepository {
           +
           "VALUES (#{studentId}, #{course}, #{startDate}, #{endDate})")
   @Options(useGeneratedKeys = true, keyProperty = "courseId")
-  void registerStudentCourse(StudentsCourses studentsCourses);
+  void registerStudentCourse(StudentCourse studentsCourses);
 
   /**
    * 指定された `studentId` の受講生情報を更新します。
@@ -106,5 +106,5 @@ public interface StudentRepository {
       "</set> " +
       "WHERE course_id = #{courseId}" +
       "</script>")
-  void updateStudentCourse(StudentsCourses studentCourse);
+  void updateStudentCourse(StudentCourse studentCourse);
 }

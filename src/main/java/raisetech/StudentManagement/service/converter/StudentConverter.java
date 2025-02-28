@@ -1,39 +1,35 @@
 package raisetech.StudentManagement.service.converter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import raisetech.StudentManagement.data.Student;
-import raisetech.StudentManagement.data.StudentsCourses;
+import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
 
 /**
- * コンバーター:受講生及び受講コース情報から受講生詳細情報(またはその逆)に変換します。
+ * converter:受講生と受講コース情報から受講生詳細情報に変換します。
  */
 
 @Component
 public class StudentConverter {
 
   /**
-   * コンバーター:受講生及び受講コース情報から受講生詳細情報(またはその逆)に変換します。
+   * 受講生と受講コース情報から受講生詳細情報に変換します。
    *
-   * @param students        受講生情報の一覧
-   * @param studentsCourses 受講コース情報の一覧
-   * @return studentDetail(受講生, 受講生に紐づく受講コース)からなる一覧
+   * @param studentsList        受講生情報の一覧
+   * @param studentsCoursesList 受講コース情報の一覧
+   * @return 受講生詳細情報(受講生, 受講生に紐づく受講コース)からなる一覧
    */
-  public List<StudentDetail> convertStudentDetails(List<Student> students,
-      List<StudentsCourses> studentsCourses) {
+  public List<StudentDetail> convertStudentDetailList(List<Student> studentsList,
+      List<StudentCourse> studentsCoursesList) {
 
-    List<StudentDetail> studentDetails = new ArrayList<>();
-    students.forEach(student -> {
-
-      List<StudentsCourses> convertStudentCourses = studentsCourses.stream()
-          .filter(studentCourse -> student.getStudentId().equals(studentCourse.getStudentId()))
-          .collect(Collectors.toList());
-
-      studentDetails.add(new StudentDetail(student, convertStudentCourses));
-    });
-    return studentDetails;
+    return studentsList.stream()
+        .map(student -> new StudentDetail(student,
+            studentsCoursesList.stream()
+                .filter(
+                    studentCourse -> student.getStudentId().equals(studentCourse.getStudentId()))
+                .collect(Collectors.toList())))
+        .collect(Collectors.toList());
   }
 }

@@ -6,8 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import raisetech.StudentManagement.data.Student;
-import raisetech.StudentManagement.data.StudentsCourses;
+import raisetech.StudentManagement.data.StudentCourse;
 
+/**
+ * domain:受講生詳細情報を表すクラスです。 受講生情報 (`Student`) と受講コース情報 (`StudentCourse`) で構成されます。
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,7 +18,7 @@ import raisetech.StudentManagement.data.StudentsCourses;
 public class StudentDetail {
 
   private Student student;
-  private List<StudentsCourses> studentsCourses;
+  private List<StudentCourse> studentCourseList;
 
 }
 
