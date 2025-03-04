@@ -1,8 +1,11 @@
 package raisetech.StudentManagement.controller;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,10 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.service.StudentService;
+import raisetech.StudentManagement.validation.StudentValidation.OnRegisterStudent;
+import raisetech.StudentManagement.validation.StudentValidation.OnUpdate;
 
 /**
  * Controller: 受講生の検索・更新・登録処理を実行する REST API。
  */
+@Validated
 @RestController
 public class StudentController {
 
@@ -42,7 +48,7 @@ public class StudentController {
    * @return 受講生詳細情報取得(受講生1名分)
    */
   @GetMapping("/student/{studentId}")
-  public StudentDetail getStudentDetail(@PathVariable("studentId") Integer studentId) {
+  public StudentDetail getStudentDetail(@PathVariable @NotNull @Min(1) Integer studentId) {
     return service.getStudentDetail(studentId);
   }
 
@@ -54,7 +60,7 @@ public class StudentController {
    */
   @PostMapping("/registerStudent")
   public ResponseEntity<StudentDetail> registerStudentDetail(
-      @RequestBody StudentDetail studentDetail) {
+      @Validated(OnRegisterStudent.class) @RequestBody StudentDetail studentDetail) {
     StudentDetail responsStudentDetail = service.registerStudentDetail(studentDetail);
     return ResponseEntity.ok(responsStudentDetail);
   }
@@ -67,9 +73,9 @@ public class StudentController {
    * @param studentDetail 更新する受講生の詳細情報
    * @return 更新完了メッセージ
    */
-
   @PutMapping("/updateStudent")
-  public ResponseEntity<String> updateStudentDetail(@RequestBody StudentDetail studentDetail) {
+  public ResponseEntity<String> updateStudentDetail(
+      @Validated(OnUpdate.class) @RequestBody StudentDetail studentDetail) {
     service.updateStudentDetail(studentDetail);
     return ResponseEntity.ok("正常に更新されました");
   }
