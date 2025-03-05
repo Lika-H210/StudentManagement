@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import raisetech.StudentManagement.data.Student;
-import raisetech.StudentManagement.data.StudentsCourses;
+import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.repository.StudentRepository;
 import raisetech.StudentManagement.service.converter.StudentConverter;
@@ -26,16 +26,15 @@ public class StudentService {
     this.converter = converter;
   }
 
-
   /**
    * 受講生及び受講生に紐づくコース情報(受講生詳細情報)の一覧を取得します。 除外対象:キャンセル扱い（`isDeleted=true`）の受講生は除外されます。
    *
    * @return 受講生詳細情報の一覧(キャンセル扱いの受講生の受講生詳細情報を除く)
    */
   public List<StudentDetail> getStudentDetailList() {
-    List<Student> students = repository.searchStudents();
-    List<StudentsCourses> studentsCourses = repository.searchStudentsCourses();
-    return converter.convertStudentDetails(students, studentsCourses);
+    List<Student> studentsList = repository.searchStudents();
+    List<StudentCourse> studentsCoursesList = repository.searchStudentsCourses();
+    return converter.convertStudentDetailList(studentsList, studentsCoursesList);
   }
 
   /**
@@ -45,9 +44,9 @@ public class StudentService {
    * @return 受講生詳細情報取得(受講生1名分)
    */
   public StudentDetail getStudentDetail(Integer studentId) {
-    Student student = repository.searchStudentsByStudentId(studentId);
-    List<StudentsCourses> studentsCourses = repository.searchStudentsCoursesByStudentId(studentId);
-    return new StudentDetail(student, studentsCourses);
+    Student student = repository.searchStudentByStudentId(studentId);
+    List<StudentCourse> studentCourses = repository.searchStudentCoursesByStudentId(studentId);
+    return new StudentDetail(student, studentCourses);
   }
 
   /**
@@ -59,9 +58,10 @@ public class StudentService {
   @Transactional
   public StudentDetail registerStudentDetail(StudentDetail studentDetail) {
     repository.registerStudent(studentDetail.getStudent());
+
     Integer studentId = studentDetail.getStudent().getStudentId();
-    List<StudentsCourses> registeredCourses = registerStudentCourses(studentId,
-        studentDetail.getStudentsCourses());
+    List<StudentCourse> registeredCourses = registerStudentCourses(studentId,
+        studentDetail.getStudentCourseList());
 
     return new StudentDetail(studentDetail.getStudent(), registeredCourses);
   }
@@ -78,8 +78,8 @@ public class StudentService {
    * </ul>
    */
   @Transactional
-  public List<StudentsCourses> registerStudentCourses(Integer studentId,
-      List<StudentsCourses> studentsCourses) {
+  public List<StudentCourse> registerStudentCourses(Integer studentId,
+      List<StudentCourse> studentsCourses) {
     //受講コース情報がない場合は空リストを返す
     if (studentsCourses == null || studentsCourses.isEmpty()) {
       return Collections.emptyList();
@@ -91,7 +91,7 @@ public class StudentService {
         repository.registerStudentCourse(studentCourse);
       }
     });
-    return repository.searchStudentsCoursesByStudentId(studentId);
+    return repository.searchStudentCoursesByStudentId(studentId);
   }
 
   /**
@@ -101,10 +101,9 @@ public class StudentService {
   public void updateStudentDetail(StudentDetail studentDetail) {
     repository.updateStudent(studentDetail.getStudent());
 
-    if (studentDetail.getStudentsCourses() != null) {
-      for (StudentsCourses studentCourse : studentDetail.getStudentsCourses()) {
-        repository.updateStudentCourse(studentCourse);
-      }
+    if (studentDetail.getStudentCourseList() != null) {
+      studentDetail.getStudentCourseList()
+          .forEach(studentCourse -> repository.updateStudentCourse(studentCourse));
     }
   }
 }
