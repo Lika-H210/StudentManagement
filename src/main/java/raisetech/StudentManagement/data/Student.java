@@ -25,14 +25,14 @@ public class Student {
   @Null(groups = OnRegisterStudent.class, message = "新規登録時は受講生IDは不要です。")
   @NotNull(groups = OnUpdate.class, message = "更新時は受講生IDが必須です。")
   @Min(value = 1,
-      groups = {OnUpdate.class},
+      groups = OnUpdate.class,
       message = "受講生IDは1以上の数字である必要があります。")
   private Integer studentId;
 
   /**
    * 受講生氏名 (必須)
    */
-  @NotEmpty(message = "氏名は必須です。")
+  @NotEmpty(groups = {OnRegisterStudent.class, OnUpdate.class}, message = "氏名は必須です。")
   @Size(max = 100,
       groups = {OnRegisterStudent.class, OnUpdate.class},
       message = "氏名は100文字以内である必要があります。")
@@ -41,7 +41,7 @@ public class Student {
   /**
    * 受講生氏名のフリガナ (必須)
    */
-  @NotEmpty(message = "フリガナは必須です。")
+  @NotEmpty(groups = {OnRegisterStudent.class, OnUpdate.class}, message = "フリガナは必須です。")
   @Size(max = 100,
       groups = {OnRegisterStudent.class, OnUpdate.class},
       message = "フリガナは100文字以内である必要があります。")
@@ -84,7 +84,7 @@ public class Student {
   /**
    * 性別
    */
-  @Pattern(regexp = "Male|Female|Other",
+  @Pattern(regexp = "Male|Female|Other|^$",
       groups = {OnRegisterStudent.class, OnUpdate.class},
       message = "性別は 'Male', 'Female', 'Other' のいずれかを入力してください。")
   private String sex;
