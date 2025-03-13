@@ -3,7 +3,7 @@ package raisetech.StudentManagement.validation;
 public interface StudentValidation {
 
   /**
-   * 新規受講生登録字のvalidation (受講コース情報の同時登録時も含む）
+   * 新規受講生登録時のvalidation (受講コース情報の同時登録時も含む）
    */
   public interface OnRegisterStudent {
 
