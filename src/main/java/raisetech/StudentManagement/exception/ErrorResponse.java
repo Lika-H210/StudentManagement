@@ -1,34 +1,29 @@
 package raisetech.StudentManagement.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Map;
 import lombok.Getter;
 
 /**
  * REST API のカスタムしたエラーレスポンスを表すクラス。
  */
+@Schema(description = "エラーレスポンス")
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
 
-  /**
-   * HTTP ステータスコード
-   */
+  @Schema(description = "HTTP ステータスコード", example = "400")
   private int status;
 
-  /**
-   * エラーコード（API 内で識別可能なコード）
-   */
+  @Schema(description = "エラーコード", example = "VALIDATION_ERROR")
   private String errorCode;
 
-  /**
-   * エラーメッセージ（概要）
-   */
+  @Schema(description = "エラーメッセージ", example = "入力のデータが不正です。")
   private String error;
 
-  /**
-   * 詳細なエラーメッセージ（バリデーションエラー時のフィールドごとのメッセージ）
-   */
+  @Schema(description = "エラー詳細情報（バリデーションエラー時のみ）",
+      example = "{\"field1\": \"値は必須です。\", \"field2\": \"文字数は100字以内にする必要があります。\"}")
   private Map<String, String> message;
 
   /**
