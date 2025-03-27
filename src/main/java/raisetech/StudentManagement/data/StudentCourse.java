@@ -25,16 +25,16 @@ public class StudentCourse {
 
   @Schema(description = "コースID (主キー)", example = "101")
   @JsonView(JsonViews.OnAll.class)
-  @Null(groups = {OnRegisterStudent.class,
-      OnRegisterCourse.class}, message = "登録時はコースIDは不要です。")
+  @Null(groups = {OnRegisterStudent.class, OnRegisterCourse.class},
+      message = "登録時はコースIDは不要です。")
   @NotNull(groups = OnUpdate.class, message = "更新時はコースIDが必須です。")
   private Integer courseId;
 
   @Schema(description = "受講生ID (外部キー)", example = "1")
   @JsonView(JsonViews.OnAll.class)
   @Null(groups = OnRegisterStudent.class, message = "受講性情報と受講コース情報の同時登録時は受講生IDは不要です。")
-  @NotNull(groups = OnUpdate.class, message = "受講コース情報の更新時は受講生IDが必須です。")
-  @NotNull(groups = OnRegisterCourse.class, message = "受講コース情報の登録時は受講生IDが必須です。")
+  @NotNull(groups = {OnUpdate.class, OnRegisterCourse.class},
+      message = "受講コース情報の登録及び更新時は受講生IDが必須です。")
   private Integer studentId;
 
   @Schema(description = "受講コース名", example = "English")

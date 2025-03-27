@@ -1,6 +1,7 @@
 package raisetech.StudentManagement.service;
 
-import java.util.Collections;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,17 +61,20 @@ public class StudentService {
     repository.registerStudent(studentDetail.getStudent());
 
     Integer studentId = studentDetail.getStudent().getStudentId();
-    List<StudentCourse> registeredCourses = registerStudentCourses(studentId,
-        studentDetail.getStudentCourseList());
-
+    List<StudentCourse> registeredCourses = new ArrayList<>();
+    //受講コース情報がnullまたは空でないときのみコース登録処理を実行
+    if (studentDetail.getStudentCourseList() != null && !studentDetail.getStudentCourseList()
+        .isEmpty()) {
+      registeredCourses = registerStudentCourses(studentId, studentDetail.getStudentCourseList());
+    }
     return new StudentDetail(studentDetail.getStudent(), registeredCourses);
   }
 
   /**
    * 受講コースの新規登録を行います。 補足:登録にはコース名(course)が必須です。
    *
-   * @param studentId       登録対象の受講生ID
-   * @param studentsCourses 登録する受講コース情報のリスト
+   * @param studentId           登録対象の受講生ID
+   * @param studentsCoursesList 登録する受講コース情報のリスト
    * @return 登録対象となる受講コースの有無により下記いづれかを返します。
    * <ul>
    *   <li>なし:空のリスト</li>
@@ -79,19 +83,23 @@ public class StudentService {
    */
   @Transactional
   public List<StudentCourse> registerStudentCourses(Integer studentId,
-      List<StudentCourse> studentsCourses) {
-    //受講コース情報がない場合は空リストを返す
-    if (studentsCourses == null || studentsCourses.isEmpty()) {
-      return Collections.emptyList();
-    }
+      List<StudentCourse> studentsCoursesList) {
     //登録処理を実行(studentCourse.courseに入力がある場合のみ)
-    studentsCourses.forEach(studentCourse -> {
+    studentsCoursesList.forEach(studentCourse -> {
       if (studentCourse.getCourse() != null && !studentCourse.getCourse().trim().isEmpty()) {
-        studentCourse.setStudentId(studentId);
+        initStudentCourse(studentId, studentCourse);
         repository.registerStudentCourse(studentCourse);
       }
     });
     return repository.searchStudentCoursesByStudentId(studentId);
+  }
+
+  static void initStudentCourse(Integer studentId, StudentCourse studentCourse) {
+    LocalDate today = LocalDate.now();
+
+    studentCourse.setStudentId(studentId);
+    studentCourse.setStartDate(today);
+    studentCourse.setEndDate(today.plusYears(1));
   }
 
   /**
@@ -101,7 +109,8 @@ public class StudentService {
   public void updateStudentDetail(StudentDetail studentDetail) {
     repository.updateStudent(studentDetail.getStudent());
 
-    if (studentDetail.getStudentCourseList() != null) {
+    if (studentDetail.getStudentCourseList() != null && !studentDetail.getStudentCourseList()
+        .isEmpty()) {
       studentDetail.getStudentCourseList()
           .forEach(studentCourse -> repository.updateStudentCourse(studentCourse));
     }
