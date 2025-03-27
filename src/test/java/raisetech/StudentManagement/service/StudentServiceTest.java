@@ -15,9 +15,12 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,11 +41,6 @@ class StudentServiceTest {
 
   @InjectMocks
   private StudentService sut;
-
-  @BeforeEach
-  void before() {
-
-  }
 
   // テスト用の共通オブジェクト
   private Integer studentId;
@@ -76,6 +74,11 @@ class StudentServiceTest {
 
     //受講コース情報の準備
     studentDetail = new StudentDetail(student, studentCourseList);
+  }
+
+  // テストデータを提供するメソッド
+  static Stream<List<StudentCourse>> provideStudentCourseLists() {
+    return Stream.of(null, Collections.emptyList());
   }
 
   @Test
@@ -125,31 +128,17 @@ class StudentServiceTest {
   }
 
   //受講生登録処理2
-  @Test
-  void 受講生情報のみの登録処理受講_コース情報はnull_repositoryの処理が適切に呼び出され且つregisterStudentCoursesは呼び出されないこと() {
-    StudentDetail studentDetail = new StudentDetail(student, null);
+  @ParameterizedTest
+  @MethodSource("provideStudentCourseLists")
+  void 受講生情報のみの登録処理_コース情報がnullまたはempty_repositoryの処理が適切に呼び出され且つregisterStudentCoursesは呼び出されないこと(
+      List<StudentCourse> studentCourseList) {
+    StudentDetail studentDetail = new StudentDetail(student, studentCourseList);
 
     StudentDetail actual = sut.registerStudentDetail(studentDetail);
 
     assertNotNull(actual);
     assertEquals(student, actual.getStudent());
     assertTrue(actual.getStudentCourseList().isEmpty());
-
-    verify(repository, times(1)).registerStudent(student);
-    verify(repository, never()).searchStudentCoursesByStudentId(anyInt());
-  }
-
-  //受講生登録処理3
-  @Test
-  void 受講生情報のみの登録処理受講_コース情報はempty_repositoryの処理が適切に呼び出され且つregisterStudentCoursesは呼び出されないこと() {
-    List<StudentCourse> emptyCourseList = Collections.emptyList();
-    StudentDetail studentDetail = new StudentDetail(student, emptyCourseList);
-
-    StudentDetail actual = sut.registerStudentDetail(studentDetail);
-
-    assertNotNull(actual);
-    assertEquals(student, actual.getStudent());
-    assertEquals(emptyCourseList, actual.getStudentCourseList());
 
     verify(repository, times(1)).registerStudent(student);
     verify(repository, never()).searchStudentCoursesByStudentId(anyInt());
@@ -203,20 +192,11 @@ class StudentServiceTest {
   }
 
   //受講生詳細情報更新処理2
-  @Test
-  void 受講生詳細情報の更新_受講生情報あり受講コースnullの場合_repositoryの処理が適切に呼び出せていること() {
-    StudentDetail studentDetail = new StudentDetail(student, null);
-
-    sut.updateStudentDetail(studentDetail);
-
-    verify(repository, times(1)).updateStudent(student);
-    verify(repository, never()).updateStudentCourse(any(StudentCourse.class));
-  }
-
-  //受講生詳細情報更新処理3
-  @Test
-  void 受講生詳細情報の更新_受講生情報あり受講コースが空リストの場合_repositoryの処理が適切に呼び出せていること() {
-    StudentDetail studentDetail = new StudentDetail(student, Collections.emptyList());
+  @ParameterizedTest
+  @MethodSource("provideStudentCourseLists")
+  void 受講生詳細情報の更新_受講生情報あり受講コースがnullまたはempty_repositoryの処理が適切に呼び出せていること(
+      List<StudentCourse> studentCourseList) {
+    StudentDetail studentDetail = new StudentDetail(student, studentCourseList);
 
     sut.updateStudentDetail(studentDetail);
 
