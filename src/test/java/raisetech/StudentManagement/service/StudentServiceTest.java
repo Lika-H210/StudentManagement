@@ -2,6 +2,7 @@ package raisetech.StudentManagement.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -24,6 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
@@ -56,7 +58,7 @@ class StudentServiceTest {
     sut = new StudentService(repository, converter);
 
     //受講生情報の準備
-    studentId = 1;
+    studentId = 999;
     student = new Student();
     student.setStudentId(studentId);
     student.setFullName("山田太郎");
@@ -108,6 +110,15 @@ class StudentServiceTest {
 
     verify(repository, times(1)).searchStudentByStudentId(studentId);
     verify(repository, times(1)).searchStudentCoursesByStudentId(studentId);
+  }
+
+  @Test
+  void 個人の受講生詳細情報の検索_対象studentIdの受講生がいない場合ResponseStatusExceptionの例外処理が行われる() {
+    when(repository.searchStudentByStudentId(studentId)).thenReturn(null);
+    when(repository.searchStudentCoursesByStudentId(studentId)).thenReturn(Collections.emptyList());
+
+    assertThrows(ResponseStatusException.class, () -> sut.getStudentDetail(studentId));
+
   }
 
   //受講生登録処理における受講コース情報の同時登録については受講コース情報登録処理(registerStudentCourses)の動作有無のみテスト
@@ -164,7 +175,7 @@ class StudentServiceTest {
       assertEquals(course.getStartDate().plusYears(1), course.getEndDate()); // 1年後になっているか
     }
 
-    verify(repository, times(1)).searchStudentCoursesByStudentId(1);
+    verify(repository, times(1)).searchStudentCoursesByStudentId(studentId);
   }
 
   //受講コースの新規作成処理

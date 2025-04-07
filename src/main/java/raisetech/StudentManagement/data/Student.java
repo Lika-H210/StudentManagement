@@ -11,7 +11,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import raisetech.StudentManagement.validation.StudentValidation.OnRegisterStudent;
 import raisetech.StudentManagement.validation.StudentValidation.OnUpdate;
@@ -24,6 +27,9 @@ import raisetech.StudentManagement.view.JsonViews;
 @Schema(description = "受講生情報")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Student {
 
   @Schema(description = "受講生ID (主キー)", example = "1")
