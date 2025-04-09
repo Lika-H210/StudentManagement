@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
@@ -47,6 +49,12 @@ public class StudentService {
   public StudentDetail getStudentDetail(Integer studentId) {
     Student student = repository.searchStudentByStudentId(studentId);
     List<StudentCourse> studentCourses = repository.searchStudentCoursesByStudentId(studentId);
+
+    //studentIdに紐づくstudentが存在しない場合404エラーを返す。
+    if (student == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "受講生が見つかりませんでした");
+    }
+
     return new StudentDetail(student, studentCourses);
   }
 
