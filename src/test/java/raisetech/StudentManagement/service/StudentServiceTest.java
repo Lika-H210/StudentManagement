@@ -12,6 +12,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static raisetech.StudentManagement.testutil.TestDataFactory.createStudentCourseNormalSimple;
+import static raisetech.StudentManagement.testutil.TestDataFactory.createStudentNormalSimple;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,20 +61,12 @@ class StudentServiceTest {
 
     //受講生情報の準備
     studentId = 999;
-    student = new Student();
-    student.setStudentId(studentId);
-    student.setFullName("山田太郎");
+    student = createStudentNormalSimple(studentId);
 
     //受講コース情報(リスト)の準備
-    course1 = new StudentCourse();
-    course1.setCourse("Java");
-
-    course2 = new StudentCourse();
-    course2.setCourse("English");
-
-    studentCourseList = new ArrayList<>();
-    studentCourseList.add(course1);
-    studentCourseList.add(course2);
+    course1 = createStudentCourseNormalSimple(999, studentId);
+    course2 = createStudentCourseNormalSimple(9999, studentId);
+    studentCourseList = List.of(course1, course2);
 
     //受講コース情報の準備
     studentDetail = new StudentDetail(student, studentCourseList);
