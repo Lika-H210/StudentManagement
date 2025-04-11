@@ -27,7 +27,7 @@ import raisetech.StudentManagement.view.JsonViews;
 @Schema(description = "受講生情報")
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Student {

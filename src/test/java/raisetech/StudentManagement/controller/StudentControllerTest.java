@@ -9,6 +9,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static raisetech.StudentManagement.testutil.TestDataFactory.createStudentCourseNormal;
+import static raisetech.StudentManagement.testutil.TestDataFactory.createStudentCourseNormalSimple;
+import static raisetech.StudentManagement.testutil.TestDataFactory.createStudentNormal;
+import static raisetech.StudentManagement.testutil.TestDataFactory.createStudentNormalSimple;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
@@ -55,9 +59,9 @@ class StudentControllerTest {
   @BeforeEach
   void setUp() {
     studentId = 999;
-    student = TestDataFactory.createStudentNormal(studentId);
-    course1 = TestDataFactory.createStudentCourseNormal(999, studentId);
-    course2 = TestDataFactory.createStudentCourseNormal(9999, studentId);
+    student = createStudentNormalSimple(studentId);
+    course1 = createStudentCourseNormalSimple(999, studentId);
+    course2 = createStudentCourseNormalSimple(9999, studentId);
     studentCourseList = List.of(course1, course2);
     studentDetail = new StudentDetail(student, Collections.emptyList());
   }
@@ -99,7 +103,7 @@ class StudentControllerTest {
       throws Exception {
     when(service.getStudentDetail(studentId)).thenReturn(studentDetail);
 
-    mockMvc.perform(get("/student/" + studentId))
+    mockMvc.perform(get("/student/{studentId}", studentId))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.student.studentId").value(studentId))
         .andExpect(jsonPath("$.student.fullName").value(student.getFullName()))
@@ -128,8 +132,8 @@ class StudentControllerTest {
   @Test
   void 受講生登録処理が実行できていること() throws Exception {
     //登録処理の正常な
-    Student student = TestDataFactory.createStudentNormal(null);
-    StudentCourse studentCourse = TestDataFactory.createStudentCourseNormal(null, null);
+    Student student = createStudentNormal(null);
+    StudentCourse studentCourse = createStudentCourseNormal(null, null);
     StudentDetail studentDetail = new StudentDetail(student, List.of(studentCourse));
 
     mockMvc.perform(post("/registerStudent")
