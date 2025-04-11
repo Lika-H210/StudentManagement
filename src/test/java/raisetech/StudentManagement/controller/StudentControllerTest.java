@@ -103,7 +103,7 @@ class StudentControllerTest {
       throws Exception {
     when(service.getStudentDetail(studentId)).thenReturn(studentDetail);
 
-    mockMvc.perform(get("/student/" + studentId))
+    mockMvc.perform(get("/student/{studentId}", studentId))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.student.studentId").value(studentId))
         .andExpect(jsonPath("$.student.fullName").value(student.getFullName()))
