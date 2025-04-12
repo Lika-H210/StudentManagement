@@ -1,11 +1,10 @@
-package raisetech.StudentManagement.controller;
+package raisetech.StudentManagement.controller.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -22,10 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import raisetech.StudentManagement.controller.StudentController;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.service.StudentService;
+import raisetech.StudentManagement.testutil.TestDataFactory;
 import raisetech.StudentManagement.validation.StudentValidation.OnRegisterStudent;
 import raisetech.StudentManagement.validation.StudentValidation.OnUpdate;
 
@@ -37,9 +38,6 @@ class StudentControllerValidationTest {
 
   @MockitoBean
   private StudentService service;
-
-  @Autowired
-  private ObjectMapper objectMapper;
 
   private Validator validator;
 
@@ -88,19 +86,21 @@ class StudentControllerValidationTest {
     //studentId,fullName,mailAddress,sex,エラーmessage
     return Stream.of(
         //@Null
-        Arguments.of(TestDataFactory.createStudentForStudentIdValidTest(999),
+        Arguments.of(ValidationTestDataFactory.createStudentForStudentIdValidTest(999),
             "新規登録時は受講生IDは不要です。"),
         //@Empty
-        Arguments.of(TestDataFactory.createStudentForFullNameValidTest(null, null),
+        Arguments.of(ValidationTestDataFactory.createStudentForFullNameValidTest(null, null),
             "氏名は必須です。"),
         //@Size
-        Arguments.of(TestDataFactory.createStudentForFullNameValidTest(null, "あ".repeat(101)),
+        Arguments.of(
+            ValidationTestDataFactory.createStudentForFullNameValidTest(null, "あ".repeat(101)),
             "氏名は100文字以内である必要があります。"),
         //@Email
-        Arguments.of(TestDataFactory.createStudentForMailValidTest(null, "mori.hajime-email"),
+        Arguments.of(
+            ValidationTestDataFactory.createStudentForMailValidTest(null, "mori.hajime-email"),
             "正しいメールアドレスを入力してください。"),
         //@Pattern
-        Arguments.of(TestDataFactory.createStudentForSexValidTest(null, "男"),
+        Arguments.of(ValidationTestDataFactory.createStudentForSexValidTest(null, "男"),
             "性別は 'Male', 'Female', 'Other' のいずれかを入力してください。")
     );
   }
@@ -133,7 +133,7 @@ class StudentControllerValidationTest {
     //course,EndDate,エラーメッセージ
     return Stream.of(
         // @FutureOrPresent: 終了日が過去の日付
-        Arguments.of(TestDataFactory.createStudentCourseWithPastEndDate(999, 999),
+        Arguments.of(ValidationTestDataFactory.createStudentCourseWithPastEndDate(999, 999),
             "受講終了日は未来または現在の日付を入力してください。")
     );
   }
@@ -187,12 +187,12 @@ class StudentControllerValidationTest {
         // studentがnull
         Arguments.of(null, List.of(), "受講生情報は必須です。"),
         // studentのfullNameがnull
-        Arguments.of(TestDataFactory.createStudentForFullNameValidTest(null, null),
+        Arguments.of(ValidationTestDataFactory.createStudentForFullNameValidTest(null, null),
             List.of(),
             "氏名は必須です。"),
         // studentCourseのコース名がnull
         Arguments.of(TestDataFactory.createStudentNormal(null),
-            List.of(TestDataFactory.createStudentCourseWithNoCourse(null, null)),
+            List.of(ValidationTestDataFactory.createStudentCourseWithNoCourse(null, null)),
             "コース名は必須です。")
     );
   }
