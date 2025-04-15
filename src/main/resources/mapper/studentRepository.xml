@@ -58,12 +58,10 @@
 
   <!-- courseId に紐づく受講コース情報を更新 -->
   <update id="updateStudentCourse" parameterType="raisetech.StudentManagement.data.StudentCourse">
-    UPDATE students_courses
-    <set>
-      <if test="course != null">course = #{course},</if>
-      <if test="startDate != null">start_date = #{startDate},</if>
-      <if test="endDate != null">end_date = #{endDate},</if>
-    </set>
+    UPDATE students_courses SET
+    course = #{course},
+    start_date = #{startDate},
+    end_date = #{endDate}
     WHERE course_id = #{courseId}
   </update>
 

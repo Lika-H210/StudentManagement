@@ -9,30 +9,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.List;
 import org.json.JSONException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.beans.factory.annotation.Autowired;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
 
-@ExtendWith(MockitoExtension.class)
 class StudentConverterTest {
-
-  @Autowired
-  private ObjectMapper objectMapper;
-
-  @InjectMocks
-  private StudentConverter sut;
-
-  @BeforeEach
-  void setUp() {
-    sut = new StudentConverter();
-  }
 
   @Test
   void studentとStudentCourseの情報からJSON形式のstudentDetailに期待通りに変換されること()
@@ -49,6 +32,7 @@ class StudentConverterTest {
     List<StudentCourse> courses = List.of(course1, course2, course3);
 
     // Act（対象メソッドの呼び出し）
+    StudentConverter sut = new StudentConverter();
     List<StudentDetail> actual = sut.convertStudentDetailList(students, courses);
 
     // 期待されるオブジェクトを生成
