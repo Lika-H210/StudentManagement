@@ -6,11 +6,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import raisetech.StudentManagement.data.Student;
-import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.validation.StudentValidation.OnRegisterStudent;
 import raisetech.StudentManagement.validation.StudentValidation.OnUpdate;
 import raisetech.StudentManagement.view.JsonViews;
@@ -23,6 +23,7 @@ import raisetech.StudentManagement.view.JsonViews;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class StudentDetail {
 
   @Schema(description = "受講生の基本情報", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -31,10 +32,10 @@ public class StudentDetail {
   @NotNull(groups = {OnRegisterStudent.class, OnUpdate.class}, message = "受講生情報は必須です。")
   private Student student;
 
-  @Schema(description = "受講コース情報のリスト")
+  @Schema(description = "受講コース詳細情報のリスト")
   @JsonView({JsonViews.OnRegister.class, JsonViews.OnAll.class})
   @Valid
-  private List<StudentCourse> studentCourseList;
+  private List<CourseDetail> courseDetailList;
 
 }
 
