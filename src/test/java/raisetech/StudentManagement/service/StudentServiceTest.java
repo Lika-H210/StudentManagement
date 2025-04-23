@@ -120,7 +120,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void 個人の受講生詳細情報の検索_StudentとCourseDetailがあるの場合_repositoryとconverterが適切に呼出され且つStudentDetailの適切に生成されていること() {
+  void 個人の受講生詳細情報の検索_StudentとCourseDetailがあるの場合_repositoryとconverterが適切に呼出され且つStudentDetailが適切に生成されていること() {
     when(repository.searchStudentByStudentId(studentId)).thenReturn(student);
     when(repository.searchStudentCoursesByStudentId(studentId)).thenReturn(studentCourseList);
     when(repository.searchCourseStatusByCourseIdList(List.of(courseId1, courseId2))).thenReturn(
@@ -164,7 +164,6 @@ class StudentServiceTest {
     when(repository.searchStudentCoursesByStudentId(studentId)).thenReturn(Collections.emptyList());
 
     assertThrows(ResponseStatusException.class, () -> sut.getStudentDetail(studentId));
-
   }
 
   //受講生登録処理における受講コース情報の同時登録については受講コース情報登録処理(registerStudentCourses)の動作有無のみテスト
@@ -195,7 +194,7 @@ class StudentServiceTest {
   //受講生登録処理2
   @ParameterizedTest
   @MethodSource("provideStudentCourseLists")
-  void 受講生情報のみの登録処理_コース詳細情報がnullまたはempty_repositoryの処理が適切に呼び出され且つregisterStudentCoursesは呼び出されないこと(
+  void 受講生情報のみの登録処理_コース詳細情報がnullまたはEmpty_repositoryの処理が適切に呼び出され且つregisterStudentCoursesは呼び出されないこと(
       List<CourseDetail> courseDetailList) {
     StudentDetail studentDetail = new StudentDetail(student, courseDetailList);
 
@@ -211,7 +210,7 @@ class StudentServiceTest {
 
   //受講コース情報登録処理
   @Test
-  void 受講コース情報の登録処理_コース情報の作成を行いかつrepositoryの処理が適切に呼び出せていること() {
+  void 受講コース情報の登録処理_コース情報の作成を行いかつrepositoryとgetCourseDetailListの処理が適切に呼び出せていること() {
     when(repository.searchStudentCoursesByStudentId(studentId)).thenReturn(studentCourseList);
     when(repository.searchCourseStatusByCourseIdList(courseIdList)).thenReturn(
         courseStatusList);
@@ -259,7 +258,7 @@ class StudentServiceTest {
   //受講生詳細情報更新処理2
   @ParameterizedTest
   @MethodSource("provideStudentCourseLists")
-  void 受講生詳細情報の更新_受講生情報あり受講コース詳細情報がnullまたはempty_repositoryの処理が適切に呼び出せていること(
+  void 受講生詳細情報の更新_受講生情報ありコース詳細情報がnullまたはEmpty_repositoryの処理が適切に呼び出せていること(
       List<CourseDetail> courseDetailList) {
     StudentDetail studentDetail = new StudentDetail(student, courseDetailList);
 
@@ -271,7 +270,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void コース詳細情報作成_StudentCourseが存在する場合_repositoryとconverterが適正つに呼出されていること() {
+  void コース詳細情報作成_受講コース情報が存在する場合_repositoryとconverterが適正つに呼出されていること() {
     when(repository.searchCourseStatusByCourseIdList(courseIdList)).thenReturn(courseStatusList);
     when(converter.convertCourseDetailList(studentCourseList, courseStatusList)).thenReturn(
         courseDetailList);
@@ -288,7 +287,7 @@ class StudentServiceTest {
 
   @ParameterizedTest
   @MethodSource("provideStudentCourseLists")
-  void コース詳細情報作成_StudentCourseにnullまたは空リストが渡された場合_空リストが返る(
+  void コース詳細情報作成_受講コース情報リストにnullまたは空リストが渡された場合_空リストが返る(
       List<StudentCourse> inputStudentCourseList) {
     List<CourseDetail> actual = sut.getCourseDetailList(inputStudentCourseList);
 

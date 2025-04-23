@@ -46,7 +46,7 @@ class StudentConverterTest {
   }
 
   @Test
-  void studentとStudentCourseの情報からJSON形式のstudentDetailに期待通りに変換されること()
+  void studentとCourseDetailの情報からJSON形式のstudentDetailに期待通りに変換されること()
       throws JsonProcessingException, JSONException {
     List<Student> students = List.of(student1, student2, student3);
     List<CourseDetail> courseDetails = List.of(courseDetail1, courseDetail2, courseDetail3);
@@ -73,7 +73,7 @@ class StudentConverterTest {
   }
 
   @Test
-  void convertCourseDetailList_StudentCourseとCourseStatusから正しくCourseDetailに変換されること()
+  void StudentCourseのListに紐づくCourseStatusを適切にJSON形式のCourseDetailに変換できていること()
       throws JsonProcessingException, JSONException {
     List<StudentCourse> studentCourses = List.of(course1, course2, course3);
     List<CourseStatus> courseStatuses = List.of(status1, status2, status3);
