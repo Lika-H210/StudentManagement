@@ -13,4 +13,13 @@ INSERT INTO students_courses (student_id, course, start_date, end_date) VALUES
 (2, 'French',  '2024-11-05', '2025-07-04'),
 (4, 'Java',    '2024-10-20', '2025-03-19'),
 (4, 'Python',  '2024-03-04', '2025-04-20'),
-(5, 'English', '2024-12-05', '2025-07-04');
+(5, 'English', '2024-12-05', '2025-04-04');
+
+-- courses_status テーブル用データ
+INSERT INTO course_status (course_id, status, provisional_application_date, application_date, cancel_date) VALUES
+(1, '仮申込', '2024-09-15', NULL, NULL),
+(2, '本申込', '2024-10-01', '2024-10-15', NULL),
+(3, 'キャンセル', '2024-10-20', NULL, '2024-11-01'),
+(4, '受講中', '2024-09-30', '2024-10-10', NULL),
+(5, '仮申込', '2024-03-01', NULL, NULL),
+(6, '受講完了', '2024-11-20', '2024-12-01', NULL);

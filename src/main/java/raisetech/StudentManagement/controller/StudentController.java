@@ -78,6 +78,7 @@ public class StudentController {
       @ApiResponse(responseCode = "400", description = "バリデーションエラー",
           content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
+  @JsonView(JsonViews.OnAll.class)
   @PostMapping("/registerStudent")
   public ResponseEntity<StudentDetail> registerStudentDetail(
       @Validated(OnRegisterStudent.class)
