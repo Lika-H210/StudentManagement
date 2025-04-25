@@ -188,7 +188,6 @@ class StudentControllerTest {
         .andExpect(jsonPath("$.courseDetailList[0].courseStatus.status").value("仮申込"))
         .andExpect(jsonPath("$.courseDetailList[1].studentCourse.courseId").isNumber())
         .andExpect(jsonPath("$.courseDetailList[1].courseStatus.status").value("仮申込"));
-    ;
 
     verify(service, times(1)).registerStudentDetail(studentDetailCaptor.capture());
   }

@@ -270,7 +270,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void コース詳細情報作成_受講コース情報が存在する場合_repositoryとconverterが適正つに呼出されていること() {
+  void コース詳細情報作成_受講コース情報が存在する場合_repositoryとconverterが適切に呼出されていること() {
     when(repository.searchCourseStatusByCourseIdList(courseIdList)).thenReturn(courseStatusList);
     when(converter.convertCourseDetailList(studentCourseList, courseStatusList)).thenReturn(
         courseDetailList);

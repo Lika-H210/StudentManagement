@@ -7,9 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.validation.StudentValidation.OnRegisterStudent;
 import raisetech.StudentManagement.validation.StudentValidation.OnUpdate;
@@ -19,8 +17,6 @@ import raisetech.StudentManagement.view.JsonViews;
  * domain:受講生詳細情報を表すクラスです。 受講生情報 (`Student`) と受講コース情報 (`StudentCourse`) で構成されます。
  */
 @Schema(description = "受講生詳細情報")
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
