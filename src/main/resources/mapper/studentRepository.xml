@@ -13,6 +13,11 @@
     SELECT * FROM students_courses
   </select>
 
+  <!-- 受講コース申込状況の一覧を取得 -->
+  <select id="searchCoursesStatus" resultType="raisetech.StudentManagement.data.CourseStatus">
+    SELECT * FROM course_status
+  </select>
+
   <!-- studentId に紐づく受講生情報を取得 -->
   <select id="searchStudentByStudentId" parameterType="java.lang.Integer"
     resultType="raisetech.StudentManagement.data.Student">
@@ -23,6 +28,17 @@
   <select id="searchStudentCoursesByStudentId" parameterType="java.lang.Integer"
     resultType="raisetech.StudentManagement.data.StudentCourse">
     SELECT * FROM students_courses WHERE student_id = #{studentId}
+  </select>
+
+  <!-- courseId に紐づく受講コース申込状況を取得 -->
+  <select id="searchCourseStatusByCourseIdList" parameterType="list"
+    resultType="raisetech.StudentManagement.data.CourseStatus">
+    SELECT *
+    FROM course_status
+    WHERE course_id IN
+    <foreach collection="list" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
   </select>
 
   <!-- 受講生情報を新規登録（student_id は自動採番） -->
@@ -39,6 +55,14 @@
     useGeneratedKeys="true" keyProperty="courseId">
     INSERT INTO students_courses (student_id, course, start_date, end_date)
     VALUES (#{studentId}, #{course}, #{startDate}, #{endDate})
+  </insert>
+
+  <!-- 受講コース申込状況を新規登録（course_status_id は自動採番） -->
+  <insert id="registerCourseStatus" parameterType="raisetech.StudentManagement.data.CourseStatus"
+    useGeneratedKeys="true" keyProperty="courseStatusId">
+    INSERT INTO course_status (course_id, status, provisional_application_date,
+    application_date,cancel_date)
+    VALUES (#{courseId},#{status}, #{provisionalApplicationDate}, #{applicationDate}, #{cancelDate})
   </insert>
 
   <!-- studentId に紐づく受講生情報を更新 -->
@@ -63,6 +87,17 @@
     start_date = #{startDate},
     end_date = #{endDate}
     WHERE course_id = #{courseId}
+  </update>
+
+  <!-- courseStatusId に紐づく受講コース情報を更新 -->
+  <update id="updateCourseStatus" parameterType="raisetech.StudentManagement.data.CourseStatus">
+    UPDATE course_status SET
+    course_id = #{courseId},
+    status = #{status},
+    provisional_application_date = #{provisionalApplicationDate},
+    application_date = #{applicationDate},
+    cancel_date = #{cancelDate}
+    WHERE course_status_id = #{courseStatusId}
   </update>
 
 </mapper>

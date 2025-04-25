@@ -1,6 +1,7 @@
 package raisetech.StudentManagement.testutil;
 
 import java.time.LocalDate;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 
@@ -41,6 +42,28 @@ public class TestDataFactory {
     return createStudentCourseNormalSimple(courseId, studentId).toBuilder()
         .startDate(LocalDate.now())
         .endDate(LocalDate.now().plusMonths(6))
+        .build();
+  }
+
+  //CourseStatus
+  //OnRegisterとOnUpdateで必要に応じてcourseStatusIdとcourseIdを設定
+  public static CourseStatus createInitCourseStatus(Integer courseStatusId,
+      Integer courseId) {
+    return CourseStatus.builder()
+        .courseStatusId(courseStatusId)
+        .courseId(courseId)
+        .status("仮申込")
+        .provisionalApplicationDate(LocalDate.now())
+        .build();
+  }
+
+  public static CourseStatus createCourseStatusNormal(Integer courseStatusId, Integer courseId) {
+    LocalDate provisionalApplicationDate = LocalDate.of(2025, 1, 1);
+    return createInitCourseStatus(courseStatusId, courseId).toBuilder()
+        .status("キャンセル")
+        .provisionalApplicationDate(provisionalApplicationDate)
+        .applicationDate(provisionalApplicationDate.plusDays(5))
+        .cancelDate(provisionalApplicationDate.plusMonths(2))
         .build();
   }
 }

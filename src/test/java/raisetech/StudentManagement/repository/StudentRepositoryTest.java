@@ -4,12 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static raisetech.StudentManagement.testutil.TestDataFactory.createStudentCourseNormal;
 import static raisetech.StudentManagement.testutil.TestDataFactory.createStudentNormal;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.testutil.TestDataFactory;
 
 @MybatisTest
 class StudentRepositoryTest {
@@ -29,7 +32,7 @@ class StudentRepositoryTest {
   void キャンセル扱いの受講生は検索結果に含まれないこと() {
     List<Student> actual = sut.searchStudents();
     boolean containsDeleted = actual.stream()
-        .anyMatch(student -> student.getStudentId() == 4); // ID=4はis_deleted=true
+        .anyMatch(student -> student.getStudentId() == 4);
     assertThat(containsDeleted).isFalse();
   }
 
@@ -37,6 +40,13 @@ class StudentRepositoryTest {
   @Test
   void 受講コース情報の全件を検索できること() {
     List<StudentCourse> actual = sut.searchStudentsCourses();
+    assertThat(actual.size()).isEqualTo(6);
+  }
+
+  //受講コース情報一覧検索
+  @Test
+  void 全件取得でcourse_statusが全て取得できること() {
+    List<CourseStatus> actual = sut.searchCoursesStatus();
     assertThat(actual.size()).isEqualTo(6);
   }
 
@@ -71,6 +81,23 @@ class StudentRepositoryTest {
   @Test
   void 存在しないstudentIdでは受講コース情報が0件になること() {
     List<StudentCourse> actual = sut.searchStudentCoursesByStudentId(999);
+    assertThat(actual).isEmpty();
+  }
+
+  //CourseIdに紐づく受講コース情報検索①
+  @Test
+  void courseIdのリストに紐づけられるcourse_statusが検索できること() {
+    List<CourseStatus> actual = sut.searchCourseStatusByCourseIdList(List.of(1, 3, 5));
+    assertThat(actual.size()).isEqualTo(3);
+    assertThat(actual)
+        .extracting(CourseStatus::getCourseId)
+        .containsExactlyInAnyOrder(1, 3, 5);
+  }
+
+  //CourseIdに紐づく受講コース情報検索②
+  @Test
+  void courseIdのリストに存在しないIDを指定した場合はcourse_statusが0件になること() {
+    List<CourseStatus> actual = sut.searchCourseStatusByCourseIdList(List.of(999, 1000));
     assertThat(actual).isEmpty();
   }
 
@@ -120,6 +147,31 @@ class StudentRepositoryTest {
         .containsExactly(2, "Java");
   }
 
+  @Test
+  void コース申込状況を新規登録できること() {
+    LocalDate today = LocalDate.now();
+    CourseStatus courseStatus = TestDataFactory.createInitCourseStatus(null, 2);
+
+    sut.registerCourseStatus(courseStatus);
+
+    // courseStatusIdの発行確認
+    assertThat(courseStatus.getCourseStatusId()).isNotNull();
+
+    // IDが割り当てられたことを前提に検索・内容を検証
+    CourseStatus actual = sut.searchCoursesStatus().stream()
+        .filter(cs -> cs.getCourseStatusId().equals(courseStatus.getCourseStatusId()))
+        .findFirst()
+        .orElseThrow();
+
+    assertThat(actual)
+        .extracting(
+            CourseStatus::getCourseId,
+            CourseStatus::getStatus,
+            CourseStatus::getProvisionalApplicationDate
+        )
+        .containsExactly(2, "仮申込", today);
+  }
+
   //受講生更新処理
   @Test
   void 受講生情報の更新が行えること() {
@@ -164,5 +216,39 @@ class StudentRepositoryTest {
             StudentCourse::getEndDate
         )
         .containsExactly(2, "Chinese", course.getEndDate());
+  }
+
+  @Test
+  void 受講コース申込状況の更新が行えること() {
+    CourseStatus courseStatus = sut.searchCoursesStatus().stream()
+        .filter(cs -> cs.getCourseStatusId().equals(2))
+        .findFirst()
+        .orElseThrow();
+
+    courseStatus.setStatus("受講完了");
+    courseStatus.setCancelDate(LocalDate.of(2025, 4, 15));
+    courseStatus.setApplicationDate(LocalDate.of(2025, 1, 15));
+
+    sut.updateCourseStatus(courseStatus);
+
+    // 更新後のデータを再取得して検証
+    CourseStatus actual = sut.searchCoursesStatus().stream()
+        .filter(cs -> cs.getCourseStatusId().equals(2))
+        .findFirst()
+        .orElseThrow();
+
+    assertThat(actual)
+        .extracting(
+            CourseStatus::getCourseId,
+            CourseStatus::getStatus,
+            CourseStatus::getApplicationDate,
+            CourseStatus::getCancelDate
+        )
+        .containsExactly(
+            courseStatus.getCourseId(),
+            "受講完了",
+            LocalDate.of(2025, 1, 15),
+            LocalDate.of(2025, 4, 15)
+        );
   }
 }
