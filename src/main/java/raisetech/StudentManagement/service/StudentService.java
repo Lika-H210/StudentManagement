@@ -16,6 +16,7 @@ import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.domain.criteria.StudentDetailSearchCriteria;
 import raisetech.StudentManagement.repository.StudentRepository;
 import raisetech.StudentManagement.service.converter.StudentConverter;
 
@@ -163,6 +164,37 @@ public class StudentService {
         .collect(Collectors.toList());
     List<CourseStatus> courseStatusList = repository.searchCourseStatusByCourseIdList(courseIdList);
     return converter.convertCourseDetailList(studentCourseList, courseStatusList);
+  }
+
+  /**
+   * 検索条件に一致する受講生詳細情報の一覧を取得します（キャンセル扱い（`student.isDeleted=true`）の受講生は除外されます。）
+   *
+   * @param criteria 検索条件
+   * @return 条件を満たす受講生詳細情報の一覧(キャンセル扱いの受講生の受講生詳細情報を除く)
+   */
+  public List<StudentDetail> searchStudentDetailListByCriteria(
+      StudentDetailSearchCriteria criteria) {
+    //DBの各テーブルに対し、対応するcriteriaで検索し一覧取得
+    List<StudentCourse> studentCoursesListByCriteria = repository.searchStudentsCoursesByCriteria(
+        criteria);
+    List<CourseStatus> courseStatusesListByCriteria = repository.searchCourseStatusesByCriteria(
+        criteria);
+    List<Student> studentListByCriteria = repository.searchStudentsByCriteria(criteria);
+
+    if (studentListByCriteria.isEmpty() || studentCoursesListByCriteria.isEmpty()
+        || courseStatusesListByCriteria.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    List<CourseDetail> courseDetailList = converter.combineStudentCourseWithCourseStatusByCourseId(
+        studentCoursesListByCriteria, courseStatusesListByCriteria);
+
+    if (courseDetailList.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    return converter.combineStudentsWithCourseDetailsByStudentId(
+        studentListByCriteria, courseDetailList);
   }
 
 }

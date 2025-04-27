@@ -6,12 +6,14 @@ import static raisetech.StudentManagement.testutil.TestDataFactory.createStudent
 
 import java.time.LocalDate;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.criteria.StudentDetailSearchCriteria;
 import raisetech.StudentManagement.testutil.TestDataFactory;
 
 @MybatisTest
@@ -19,6 +21,13 @@ class StudentRepositoryTest {
 
   @Autowired
   private StudentRepository sut;
+
+  private StudentDetailSearchCriteria criteria;
+
+  @BeforeEach
+  void setUp() {
+    criteria = new StudentDetailSearchCriteria();
+  }
 
   //受講生情報一覧検索①
   @Test
@@ -50,6 +59,101 @@ class StudentRepositoryTest {
     assertThat(actual.size()).isEqualTo(6);
   }
 
+  // 条件指定受講生検索1
+  @Test
+  void 条件指定検索_検索条件に氏名を指定して想定通り検索できること() {
+    criteria.setFullName("田");
+    List<Student> actual = sut.searchStudentsByCriteria(criteria);
+
+    assertThat(actual).hasSize(2);
+    assertThat(actual).allMatch(student -> student.getFullName().contains("田"));
+  }
+
+  // 条件指定受講生検索2
+  @Test
+  void 条件指定受講生検索_検索条件にカナ名を指定して想定通り検索できること() {
+    criteria.setFullNameKana("タロウ");
+    List<Student> actual = sut.searchStudentsByCriteria(criteria);
+
+    assertThat(actual).hasSize(2);
+    assertThat(actual).allMatch(student -> student.getFullNameKana().contains("タロウ"));
+  }
+
+  // 条件指定受講生検索3
+  @Test
+  void 条件指定受講生検索_検索条件に居住地を指定して想定通り検索できること() {
+    criteria.setResidenceArea("東京");
+    List<Student> actual = sut.searchStudentsByCriteria(criteria);
+
+    assertThat(actual).hasSize(2);
+    assertThat(actual).allMatch(student -> student.getResidenceArea().contains("東京"));
+  }
+
+  // 条件指定受講生検索4
+  @Test
+  void 条件指定受講生検索_検索条件に前3条件を指定して想定通り検索できること() {
+    criteria.setFullName("田");
+    criteria.setFullNameKana("タロウ");
+    criteria.setResidenceArea("東京");
+    List<Student> actual = sut.searchStudentsByCriteria(criteria);
+
+    assertThat(actual).hasSize(1);
+    assertThat(actual).allMatch(student -> student.getResidenceArea().contains("東京"));
+  }
+
+  //　条件指定受講生検索5
+  @Test
+  void 条件指定受講生検索_条件未指定で論理削除を除く全件取得できること() {
+    List<Student> actual = sut.searchStudentsByCriteria(criteria);
+    boolean containsDeleted = actual.stream()
+        .anyMatch(student -> student.getStudentId() == 4);
+    assertThat(containsDeleted).isFalse();
+  }
+
+  //　条件指定受講生検索6
+  @Test
+  void 条件指定受講生検索_条件を満たす受講生がいない場合に空リストが返ること() {
+    criteria.setFullName("佐々木");
+    List<Student> actual = sut.searchStudentsByCriteria(criteria);
+    assertThat(actual).isEmpty();
+  }
+
+  // 条件指定受講コース検索1
+  @Test
+  void 条件指定検索_検索条件にコース名を指定して想定通り検索できること() {
+    criteria.setCourse("English");
+    List<StudentCourse> actual = sut.searchStudentsCoursesByCriteria(criteria);
+
+    assertThat(actual).hasSize(2);
+    assertThat(actual).allMatch(student -> student.getCourse().contains("English"));
+  }
+
+  // 条件指定受講コース検索2
+  @Test
+  void 条件指定受講生検索_条件を満たす受講コースがいない場合に空リストが返ること() {
+    criteria.setCourse("Chinese");
+    List<StudentCourse> actual = sut.searchStudentsCoursesByCriteria(criteria);
+    assertThat(actual).isEmpty();
+  }
+
+  // 条件指定コース申込状況検索1
+  @Test
+  void 条件指定検索_検索条件に申込状況を指定して想定通り検索できること() {
+    criteria.setStatus("仮申込");
+    List<CourseStatus> actual = sut.searchCourseStatusesByCriteria(criteria);
+
+    assertThat(actual).hasSize(2);
+    assertThat(actual).allMatch(student -> student.getStatus().contains("仮申込"));
+  }
+
+  // 条件指定コース申込状況検索2
+  @Test
+  void 条件指定受講生検索_条件を満たす申込状況がいない場合に空リストが返ること() {
+    criteria.setStatus("Chinese");
+    List<CourseStatus> actual = sut.searchCourseStatusesByCriteria(criteria);
+    assertThat(actual).isEmpty();
+  }
+
   //StudentIdに基づく受講生情報検索①
   @Test
   void studentIdに基づく受講生情報の検索ができること() {
@@ -57,7 +161,6 @@ class StudentRepositoryTest {
     assertThat(actual)
         .extracting(Student::getFullName, Student::getFullNameKana, Student::getMailAddress)
         .containsExactly("山田_花子", "ヤマダ_ハナコ", "yamada_hanako@gmail.com");
-
   }
 
   //StudentIdに基づく受講生情報検索②

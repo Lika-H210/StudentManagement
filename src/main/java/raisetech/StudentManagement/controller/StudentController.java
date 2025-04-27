@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.domain.criteria.StudentDetailSearchCriteria;
 import raisetech.StudentManagement.exception.ErrorResponse;
 import raisetech.StudentManagement.exception.TestException;
 import raisetech.StudentManagement.service.StudentService;
@@ -50,6 +52,20 @@ public class StudentController {
   @GetMapping("/studentsList")
   public List<StudentDetail> getStudentDetailList() {
     return service.getStudentDetailList();
+  }
+
+  /**
+   * 指定条件を満たす受講生詳細情報の一覧を取得します。 除外対象:キャンセル扱い（`isDeleted=true`）の受講生は検索条件に関わらず除外されます。
+   *
+   * @return 指定条件を満たす受講生詳細情報の一覧(条件によらずキャンセル扱いの受講生は含まれない)
+   */
+  @Operation(summary = "検索", description = "条件を満たす受講生詳細情報の一覧を検索します。※キャンセル扱いの受講生は除外")
+  @GetMapping("/studentsList/search")
+  public ResponseEntity<List<StudentDetail>> searchStudentDetailsByCriteria(
+      @Parameter(name = "criteria", description = "検索条件")
+      @Valid StudentDetailSearchCriteria criteria) {
+    List<StudentDetail> getStudentDetailList = service.searchStudentDetailListByCriteria(criteria);
+    return ResponseEntity.ok(getStudentDetailList);
   }
 
   /**

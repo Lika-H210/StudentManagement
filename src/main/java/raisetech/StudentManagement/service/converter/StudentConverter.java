@@ -39,6 +39,8 @@ public class StudentConverter {
   }
 
   /**
+   * 受講コース一覧に基づく受講生詳細情報に変換します。
+   *
    * @param studentsCoursesList
    * @param courseStatusesList
    * @return studentsCoursesListに基づくCourseDetailList
@@ -51,6 +53,44 @@ public class StudentConverter {
 
     return studentsCoursesList.stream()
         .map(course -> new CourseDetail(course, statusMap.get(course.getCourseId())))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * 受講コース一覧とコース申込状況一覧からどちらにも同じcourseIdがある組のみをCourseDetailに変換し一覧化ます。
+   *
+   * @param studentCourseList
+   * @param courseStatusList
+   * @return studentsCoursesListに基づくCourseDetailList
+   */
+  public List<CourseDetail> combineStudentCourseWithCourseStatusByCourseId(
+      List<StudentCourse> studentCourseList,
+      List<CourseStatus> courseStatusList) {
+    Map<Integer, CourseStatus> courseStatusMap = courseStatusList.stream()
+        .collect(Collectors.toMap(CourseStatus::getCourseId, Function.identity()));
+
+    return studentCourseList.stream()
+        .filter(studentCourse -> courseStatusMap.containsKey(studentCourse.getCourseId()))
+        .map(studentCourse -> new CourseDetail(studentCourse,
+            courseStatusMap.get(studentCourse.getCourseId())))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * 受講コース一覧とコース申込状況一覧からどちらにも同じcourseIdがある組のみをCourseDetailに変換し一覧化ます。
+   *
+   * @param studentList
+   * @param courseDetailList
+   * @return studentsCoursesListに基づくCourseDetailList
+   */
+  public List<StudentDetail> combineStudentsWithCourseDetailsByStudentId(List<Student> studentList,
+      List<CourseDetail> courseDetailList) {
+    Map<Integer, List<CourseDetail>> courseDetailMap = courseDetailList.stream()
+        .collect(Collectors.groupingBy(cd -> cd.getStudentCourse().getStudentId()));
+
+    return studentList.stream()
+        .filter(student -> courseDetailMap.containsKey(student.getStudentId()))
+        .map(student -> new StudentDetail(student, courseDetailMap.get(student.getStudentId())))
         .collect(Collectors.toList());
   }
 }

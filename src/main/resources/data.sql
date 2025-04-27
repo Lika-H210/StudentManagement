@@ -2,9 +2,9 @@
 INSERT INTO students (full_name, full_name_kana, nickname, mail_address, residence_area, age, sex, remark, is_deleted) VALUES
 ('田中_太郎', 'タナカ_タロウ', 'タロー', 'tanaka_taro@gmail.com', '東京_葛飾区', 25, 'Male', '', false),
 ('山田_花子', 'ヤマダ_ハナコ', 'ハナ', 'yamada_hanako@gmail.com', '千葉県_船橋市', 20, 'Female', '', false),
-('斎藤_肇', 'サイトウ_ハジメ', 'ハジメ', 'saito_hajime@example.com', '神奈川_横浜市', 35, 'Male', '', false),
-('鈴木_一郎', 'スズキ_イチロウ', 'イチロー', 'suzuki_ichi@example.com', '愛知_名古屋市', 28, 'Male', '', true),
-('小林_かおり', 'コバヤシ_カオリ', 'カオリ', 'kobayashi_kaori@example.com', '京都_京都市', 32, 'Female', NULL, false);
+('斎藤_太朗', 'サイトウ_タロウ', 'タロウ', 'saito_tarou@example.com', '神奈川_横浜市', 35, 'Male', '', false),
+('鈴木_一郎', 'スズキ_イチロウ', 'イチロー', 'suzuki_ichi@example.com', '京都_京都市', 28, 'Male', '', true),
+('小林_かおり', 'コバヤシ_カオリ', 'カオリ', 'kobayashi_kaori@example.com', '東京_立川市', 32, 'Female', NULL, false);
 
 -- students_courses テーブル用データ
 INSERT INTO students_courses (student_id, course, start_date, end_date) VALUES
