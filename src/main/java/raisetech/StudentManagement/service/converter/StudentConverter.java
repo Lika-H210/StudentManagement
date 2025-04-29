@@ -19,26 +19,6 @@ import raisetech.StudentManagement.domain.StudentDetail;
 public class StudentConverter {
 
   /**
-   * 受講生と受講コース情報から受講生詳細情報に変換します。
-   *
-   * @param studentsList     受講生情報の一覧
-   * @param courseDetailList 受講コース情報の一覧
-   * @return 受講生詳細情報(受講生, 受講生に紐づく受講コース)からなる一覧
-   */
-  public List<StudentDetail> convertStudentDetailList(List<Student> studentsList,
-      List<CourseDetail> courseDetailList) {
-
-    return studentsList.stream()
-        .map(student -> new StudentDetail(student,
-            courseDetailList.stream()
-                .filter(
-                    courseDetail -> student.getStudentId()
-                        .equals(courseDetail.getStudentCourse().getStudentId()))
-                .collect(Collectors.toList())))
-        .collect(Collectors.toList());
-  }
-
-  /**
    * 受講コース一覧に基づく受講生詳細情報に変換します。
    *
    * @param studentsCoursesList

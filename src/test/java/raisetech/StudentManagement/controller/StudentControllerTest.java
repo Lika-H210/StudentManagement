@@ -92,15 +92,6 @@ class StudentControllerTest {
     studentDetail = new StudentDetail(student, Collections.emptyList());
   }
 
-  //受講生詳細情報一覧の取得1
-  @Test
-  void 受講生詳細の一覧検索が実行できていること() throws Exception {
-    mockMvc.perform(get("/studentsList"))
-        .andExpect(status().isOk());
-
-    verify(service, times(1)).getStudentDetailList();
-  }
-
   //指定条件を満たす受講生詳細情報の取得1/正常200
   @Test
   void 受講生詳細情報の条件指定検索で条件が適切に送られかつ検索結果がJson形式で取得できること()
@@ -114,7 +105,7 @@ class StudentControllerTest {
     when(service.searchStudentDetailListByCriteria(criteriaCaptor.capture()))
         .thenReturn(studentDetailList);
 
-    mockMvc.perform(get("/studentsList/search")
+    mockMvc.perform(get("/studentsList")
             .param("fullName", "森 一")
             .param("course", "Java")
             .param("status", "仮申込")

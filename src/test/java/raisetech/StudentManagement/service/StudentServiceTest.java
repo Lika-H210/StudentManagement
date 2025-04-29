@@ -194,25 +194,6 @@ class StudentServiceTest {
   }
 
   @Test
-  void 受講生詳細情報の一覧検索_repositoryとconverterの処理が適切に呼び出せていること() {
-    when(repository.searchStudents()).thenReturn(List.of(student));
-    when(repository.searchStudentsCourses()).thenReturn(studentCourseList);
-    when(repository.searchCoursesStatus()).thenReturn(courseStatusList);
-    when(converter.convertCourseDetailList(studentCourseList, courseStatusList)).thenReturn(
-        courseDetailList);
-    when(converter.convertStudentDetailList(List.of(student), courseDetailList)).thenReturn(
-        List.of(studentDetail));
-
-    List<StudentDetail> actual = sut.getStudentDetailList();
-
-    verify(repository, times(1)).searchStudents();
-    verify(repository, times(1)).searchStudentsCourses();
-    verify(repository, times(1)).searchCoursesStatus();
-    verify(converter, times(1)).convertCourseDetailList(studentCourseList, courseStatusList);
-    verify(converter, times(1)).convertStudentDetailList(List.of(student), courseDetailList);
-  }
-
-  @Test
   void 個人の受講生詳細情報の検索_StudentとCourseDetailがあるの場合_repositoryとconverterが適切に呼出され且つStudentDetailが適切に生成されていること() {
     when(repository.searchStudentByStudentId(studentId)).thenReturn(student);
     when(repository.searchStudentCoursesByStudentId(studentId)).thenReturn(studentCourseList);

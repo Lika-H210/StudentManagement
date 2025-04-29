@@ -27,7 +27,7 @@ class StudentConverterTest {
   private StudentCourse course1, course2, course3;
   private CourseStatus status1, status2, status3;
   private CourseDetail courseDetail1, courseDetail2, courseDetail3;
-  private StudentDetail studentDetail1, studentDetail2, studentDetail3;
+  private StudentDetail studentDetail1;
 
   @BeforeEach
   void setUp() {
@@ -50,31 +50,6 @@ class StudentConverterTest {
     courseDetail3 = new CourseDetail(course3, status3);
 
     studentDetail1 = new StudentDetail(student1, List.of(courseDetail1, courseDetail2));
-    studentDetail2 = new StudentDetail(student2, List.of(courseDetail3));
-    studentDetail3 = new StudentDetail(student3, List.of());
-
-  }
-
-  @Test
-  void studentとCourseDetailの情報からJSON形式のstudentDetailに期待通りに変換されること()
-      throws JsonProcessingException, JSONException {
-    List<Student> students = List.of(student1, student2, student3);
-    List<CourseDetail> courseDetails = List.of(courseDetail1, courseDetail2, courseDetail3);
-
-    // Act（対象メソッドの呼び出し）
-    List<StudentDetail> actual = sut.convertStudentDetailList(students, courseDetails);
-
-    // 期待されるオブジェクトを生成
-    List<StudentDetail> expected = List.of(studentDetail1, studentDetail2, studentDetail3);
-    // JSON比較
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule());
-    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-    String actualJson = mapper.writeValueAsString(actual);
-    String expectedJson = mapper.writeValueAsString(expected);
-
-    JSONAssert.assertEquals(expectedJson, actualJson, true);
   }
 
   @Test

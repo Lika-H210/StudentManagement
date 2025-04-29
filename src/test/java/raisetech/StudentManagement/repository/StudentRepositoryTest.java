@@ -29,36 +29,6 @@ class StudentRepositoryTest {
     criteria = new StudentDetailSearchCriteria();
   }
 
-  //受講生情報一覧検索①
-  @Test
-  void キャンセル扱いを除いた受講生情報の全件を検索できること() {
-    List<Student> actual = sut.searchStudents();
-    assertThat(actual.size()).isEqualTo(4);
-  }
-
-  //受講生情報一覧検索②
-  @Test
-  void キャンセル扱いの受講生は検索結果に含まれないこと() {
-    List<Student> actual = sut.searchStudents();
-    boolean containsDeleted = actual.stream()
-        .anyMatch(student -> student.getStudentId() == 4);
-    assertThat(containsDeleted).isFalse();
-  }
-
-  //受講コース情報一覧検索
-  @Test
-  void 受講コース情報の全件を検索できること() {
-    List<StudentCourse> actual = sut.searchStudentsCourses();
-    assertThat(actual.size()).isEqualTo(6);
-  }
-
-  //受講コース情報一覧検索
-  @Test
-  void 全件取得でcourse_statusが全て取得できること() {
-    List<CourseStatus> actual = sut.searchCoursesStatus();
-    assertThat(actual.size()).isEqualTo(6);
-  }
-
   // 条件指定受講生検索1
   @Test
   void 条件指定検索_検索条件に氏名を指定して想定通り検索できること() {
@@ -252,8 +222,9 @@ class StudentRepositoryTest {
 
   @Test
   void コース申込状況を新規登録できること() {
+    Integer courseId = 7;
     LocalDate today = LocalDate.now();
-    CourseStatus courseStatus = TestDataFactory.createInitCourseStatus(null, 2);
+    CourseStatus courseStatus = TestDataFactory.createInitCourseStatus(null, courseId);
 
     sut.registerCourseStatus(courseStatus);
 
@@ -261,18 +232,16 @@ class StudentRepositoryTest {
     assertThat(courseStatus.getCourseStatusId()).isNotNull();
 
     // IDが割り当てられたことを前提に検索・内容を検証
-    CourseStatus actual = sut.searchCoursesStatus().stream()
-        .filter(cs -> cs.getCourseStatusId().equals(courseStatus.getCourseStatusId()))
-        .findFirst()
-        .orElseThrow();
-
-    assertThat(actual)
+    List<CourseStatus> actualList = sut.searchCourseStatusByCourseIdList(List.of(courseId));
+    assertThat(actualList)
+        .hasSize(1)
+        .first()
         .extracting(
             CourseStatus::getCourseId,
             CourseStatus::getStatus,
             CourseStatus::getProvisionalApplicationDate
         )
-        .containsExactly(2, "仮申込", today);
+        .containsExactly(courseId, "仮申込", today);
   }
 
   //受講生更新処理
@@ -323,10 +292,9 @@ class StudentRepositoryTest {
 
   @Test
   void 受講コース申込状況の更新が行えること() {
-    CourseStatus courseStatus = sut.searchCoursesStatus().stream()
-        .filter(cs -> cs.getCourseStatusId().equals(2))
-        .findFirst()
-        .orElseThrow();
+    List<CourseStatus> courseStatusList = sut.searchCourseStatusByCourseIdList(List.of(2));
+    assertThat(courseStatusList).hasSize(1);
+    CourseStatus courseStatus = courseStatusList.getFirst();
 
     courseStatus.setStatus("受講完了");
     courseStatus.setCancelDate(LocalDate.of(2025, 4, 15));
@@ -335,10 +303,9 @@ class StudentRepositoryTest {
     sut.updateCourseStatus(courseStatus);
 
     // 更新後のデータを再取得して検証
-    CourseStatus actual = sut.searchCoursesStatus().stream()
-        .filter(cs -> cs.getCourseStatusId().equals(2))
-        .findFirst()
-        .orElseThrow();
+    List<CourseStatus> updatedList = sut.searchCourseStatusByCourseIdList(List.of(2));
+    assertThat(updatedList).hasSize(1);
+    CourseStatus actual = updatedList.getFirst();
 
     assertThat(actual)
         .extracting(

@@ -36,17 +36,34 @@ public class StudentService {
   }
 
   /**
-   * 受講生及び受講生に紐づくコース詳細情報(受講生詳細情報)の一覧を取得します。 除外対象:キャンセル扱い（`student.isDeleted=true`）の受講生は除外されます。
+   * 検索条件に一致する受講生詳細情報の一覧を取得します（キャンセル扱い（`student.isDeleted=true`）の受講生は除外されます。）
    *
-   * @return 受講生詳細情報の一覧(キャンセル扱いの受講生の受講生詳細情報を除く)
+   * @param criteria 検索条件
+   * @return 条件を満たす受講生詳細情報の一覧(キャンセル扱いの受講生の受講生詳細情報を除く)
    */
-  public List<StudentDetail> getStudentDetailList() {
-    List<Student> studentsList = repository.searchStudents();
-    List<StudentCourse> studentsCoursesList = repository.searchStudentsCourses();
-    List<CourseStatus> courseStatusList = repository.searchCoursesStatus();
-    List<CourseDetail> courseDetailList = converter.convertCourseDetailList(studentsCoursesList,
-        courseStatusList);
-    return converter.convertStudentDetailList(studentsList, courseDetailList);
+  public List<StudentDetail> searchStudentDetailListByCriteria(
+      StudentDetailSearchCriteria criteria) {
+    //DBの各テーブルに対し、対応するcriteriaで検索し一覧取得
+    List<StudentCourse> studentCoursesListByCriteria = repository.searchStudentsCoursesByCriteria(
+        criteria);
+    List<CourseStatus> courseStatusesListByCriteria = repository.searchCourseStatusesByCriteria(
+        criteria);
+    List<Student> studentListByCriteria = repository.searchStudentsByCriteria(criteria);
+
+    if (studentListByCriteria.isEmpty() || studentCoursesListByCriteria.isEmpty()
+        || courseStatusesListByCriteria.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    List<CourseDetail> courseDetailList = converter.combineStudentCourseWithCourseStatusByCourseId(
+        studentCoursesListByCriteria, courseStatusesListByCriteria);
+
+    if (courseDetailList.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    return converter.combineStudentsWithCourseDetailsByStudentId(
+        studentListByCriteria, courseDetailList);
   }
 
   /**
@@ -164,37 +181,6 @@ public class StudentService {
         .collect(Collectors.toList());
     List<CourseStatus> courseStatusList = repository.searchCourseStatusByCourseIdList(courseIdList);
     return converter.convertCourseDetailList(studentCourseList, courseStatusList);
-  }
-
-  /**
-   * 検索条件に一致する受講生詳細情報の一覧を取得します（キャンセル扱い（`student.isDeleted=true`）の受講生は除外されます。）
-   *
-   * @param criteria 検索条件
-   * @return 条件を満たす受講生詳細情報の一覧(キャンセル扱いの受講生の受講生詳細情報を除く)
-   */
-  public List<StudentDetail> searchStudentDetailListByCriteria(
-      StudentDetailSearchCriteria criteria) {
-    //DBの各テーブルに対し、対応するcriteriaで検索し一覧取得
-    List<StudentCourse> studentCoursesListByCriteria = repository.searchStudentsCoursesByCriteria(
-        criteria);
-    List<CourseStatus> courseStatusesListByCriteria = repository.searchCourseStatusesByCriteria(
-        criteria);
-    List<Student> studentListByCriteria = repository.searchStudentsByCriteria(criteria);
-
-    if (studentListByCriteria.isEmpty() || studentCoursesListByCriteria.isEmpty()
-        || courseStatusesListByCriteria.isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    List<CourseDetail> courseDetailList = converter.combineStudentCourseWithCourseStatusByCourseId(
-        studentCoursesListByCriteria, courseStatusesListByCriteria);
-
-    if (courseDetailList.isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    return converter.combineStudentsWithCourseDetailsByStudentId(
-        studentListByCriteria, courseDetailList);
   }
 
 }

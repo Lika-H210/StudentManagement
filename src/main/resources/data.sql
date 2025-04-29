@@ -13,7 +13,9 @@ INSERT INTO students_courses (student_id, course, start_date, end_date) VALUES
 (2, 'French',  '2024-11-05', '2025-07-04'),
 (4, 'Java',    '2024-10-20', '2025-03-19'),
 (4, 'Python',  '2024-03-04', '2025-04-20'),
-(5, 'English', '2024-12-05', '2025-04-04');
+(5, 'English', '2024-12-05', '2025-04-04'),
+ -- 下記は対応するcourse_statusが未登録のdata
+(5, 'French',  '2024-12-10', '2025-07-09');
 
 -- courses_status テーブル用データ
 INSERT INTO course_status (course_id, status, provisional_application_date, application_date, cancel_date) VALUES

@@ -44,24 +44,13 @@ public class StudentController {
   }
 
   /**
-   * 受講生及び受講生に紐づくコース情報(受講生詳細情報)の一覧を取得します。 除外対象:キャンセル扱い（`isDeleted=true`）の受講生は除外されます。
-   *
-   * @return 受講生詳細情報の一覧(キャンセル扱いの受講生の受講生詳細情報を除く)
-   */
-  @Operation(summary = "全件検索", description = "受講生詳細情報の一覧を検索します。※キャンセル扱いの受講生は除外")
-  @GetMapping("/studentsList")
-  public List<StudentDetail> getStudentDetailList() {
-    return service.getStudentDetailList();
-  }
-
-  /**
    * 指定条件を満たす受講生詳細情報の一覧を取得します。 除外対象:キャンセル扱い（`isDeleted=true`）の受講生は検索条件に関わらず除外されます。
    *
    * @return 指定条件を満たす受講生詳細情報の一覧(条件によらずキャンセル扱いの受講生は含まれない)
    */
   @Operation(summary = "検索", description = "条件を満たす受講生詳細情報の一覧を検索します。※キャンセル扱いの受講生は除外")
-  @GetMapping("/studentsList/search")
-  public ResponseEntity<List<StudentDetail>> searchStudentDetailsByCriteria(
+  @GetMapping("/studentsList")
+  public ResponseEntity<List<StudentDetail>> getStudentDetailList(
       @Parameter(name = "criteria", description = "検索条件")
       @Valid StudentDetailSearchCriteria criteria) {
     List<StudentDetail> getStudentDetailList = service.searchStudentDetailListByCriteria(criteria);

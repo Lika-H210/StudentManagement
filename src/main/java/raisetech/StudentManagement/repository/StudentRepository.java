@@ -15,27 +15,6 @@ import raisetech.StudentManagement.domain.criteria.StudentDetailSearchCriteria;
 public interface StudentRepository {
 
   /**
-   * 受講生情報の一覧を取得します。 除外対象:キャンセル扱い（`isDeleted=true`）の受講生は除外されます。
-   *
-   * @return 受講生の一覧(キャンセル扱いの受講生を除く)
-   */
-  List<Student> searchStudents();
-
-  /**
-   * 受講コース情報の一覧を取得します。
-   *
-   * @return 受講コースの一覧(全件)
-   */
-  List<StudentCourse> searchStudentsCourses();
-
-  /**
-   * 受講コースの申込状況の一覧を取得します。
-   *
-   * @return 受講コースの申込状況の一覧(全件)
-   */
-  List<CourseStatus> searchCoursesStatus();
-
-  /**
    * 指定条件を満たす受講生情報を取得します。 除外対象:キャンセル扱い（`isDeleted=true`）の受講生は検索対象外。
    *
    * @return 受講生の条件検索結果一覧(キャンセル扱いの受講生は対象外)
@@ -55,7 +34,6 @@ public interface StudentRepository {
    * @return 受講生の条件検索結果一覧(キャンセル扱いの受講生は対象外)
    */
   List<CourseStatus> searchCourseStatusesByCriteria(StudentDetailSearchCriteria criteria);
-
 
   /**
    * 指定された `studentId` に紐づく受講生情報を取得します。
