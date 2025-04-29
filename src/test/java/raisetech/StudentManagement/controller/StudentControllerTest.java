@@ -1,6 +1,7 @@
 package raisetech.StudentManagement.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -37,6 +38,7 @@ import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.domain.criteria.StudentDetailSearchCriteria;
 import raisetech.StudentManagement.service.StudentService;
 import raisetech.StudentManagement.view.JsonViews;
 
@@ -90,13 +92,49 @@ class StudentControllerTest {
     studentDetail = new StudentDetail(student, Collections.emptyList());
   }
 
-  //受講生詳細情報一覧の取得1
+  //指定条件を満たす受講生詳細情報の取得1/正常200
   @Test
-  void 受講生詳細の一覧検索が実行できていること() throws Exception {
-    mockMvc.perform(get("/studentsList"))
-        .andExpect(status().isOk());
+  void 受講生詳細情報の条件指定検索で条件が適切に送られかつ検索結果がJson形式で取得できること()
+      throws Exception {
+    studentDetail.setCourseDetailList(courseDetailList);
+    List<StudentDetail> studentDetailList = List.of(studentDetail);
 
-    verify(service, times(1)).getStudentDetailList();
+    ArgumentCaptor<StudentDetailSearchCriteria> criteriaCaptor =
+        ArgumentCaptor.forClass(StudentDetailSearchCriteria.class);
+
+    when(service.searchStudentDetailListByCriteria(criteriaCaptor.capture()))
+        .thenReturn(studentDetailList);
+
+    mockMvc.perform(get("/studentsList")
+            .param("fullName", "森 一")
+            .param("course", "Java")
+            .param("status", "仮申込")
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$[0].student.studentId").value(student.getStudentId()))
+        .andExpect(jsonPath("$[0].student.fullName").value(student.getFullName()))
+        .andExpect(jsonPath("$[0].courseDetailList", hasSize(2)))
+        .andExpect(jsonPath("$[0].courseDetailList[0].studentCourse.courseId").value(
+            course1.getCourseId()))
+        .andExpect(
+            jsonPath("$[0].courseDetailList[0].studentCourse.course").value(course1.getCourse()))
+        .andExpect(jsonPath("$[0].courseDetailList[0].courseStatus.status").value(
+            initCourseStatus1.getStatus()))
+        .andExpect(jsonPath("$[0].courseDetailList[1].studentCourse.courseId").value(
+            course2.getCourseId()))
+        .andExpect(
+            jsonPath("$[0].courseDetailList[1].studentCourse.course").value(course2.getCourse()))
+        .andExpect(jsonPath("$[0].courseDetailList[1].courseStatus.status").value(
+            initCourseStatus2.getStatus()));
+
+    StudentDetailSearchCriteria capturedCriteria = criteriaCaptor.getValue();
+    assertEquals("森 一", capturedCriteria.getFullName());
+    assertEquals("Java", capturedCriteria.getCourse());
+    assertEquals("仮申込", capturedCriteria.getStatus());
+
+    verify(service, times(1)).searchStudentDetailListByCriteria(
+        any(StudentDetailSearchCriteria.class));
   }
 
   //個人の受講生詳細情報の取得1/正常200

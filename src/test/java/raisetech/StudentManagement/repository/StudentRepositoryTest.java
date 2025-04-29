@@ -6,12 +6,14 @@ import static raisetech.StudentManagement.testutil.TestDataFactory.createStudent
 
 import java.time.LocalDate;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.criteria.StudentDetailSearchCriteria;
 import raisetech.StudentManagement.testutil.TestDataFactory;
 
 @MybatisTest
@@ -20,34 +22,106 @@ class StudentRepositoryTest {
   @Autowired
   private StudentRepository sut;
 
-  //受講生情報一覧検索①
-  @Test
-  void キャンセル扱いを除いた受講生情報の全件を検索できること() {
-    List<Student> actual = sut.searchStudents();
-    assertThat(actual.size()).isEqualTo(4);
+  private StudentDetailSearchCriteria criteria;
+
+  @BeforeEach
+  void setUp() {
+    criteria = new StudentDetailSearchCriteria();
   }
 
-  //受講生情報一覧検索②
+  // 条件指定受講生検索1
   @Test
-  void キャンセル扱いの受講生は検索結果に含まれないこと() {
-    List<Student> actual = sut.searchStudents();
+  void 条件指定検索_検索条件に氏名を指定して想定通り検索できること() {
+    criteria.setFullName("田");
+    List<Student> actual = sut.searchStudentsByCriteria(criteria);
+
+    assertThat(actual).hasSize(2);
+    assertThat(actual).allMatch(student -> student.getFullName().contains("田"));
+  }
+
+  // 条件指定受講生検索2
+  @Test
+  void 条件指定受講生検索_検索条件にカナ名を指定して想定通り検索できること() {
+    criteria.setFullNameKana("タロウ");
+    List<Student> actual = sut.searchStudentsByCriteria(criteria);
+
+    assertThat(actual).hasSize(2);
+    assertThat(actual).allMatch(student -> student.getFullNameKana().contains("タロウ"));
+  }
+
+  // 条件指定受講生検索3
+  @Test
+  void 条件指定受講生検索_検索条件に居住地を指定して想定通り検索できること() {
+    criteria.setResidenceArea("東京");
+    List<Student> actual = sut.searchStudentsByCriteria(criteria);
+
+    assertThat(actual).hasSize(2);
+    assertThat(actual).allMatch(student -> student.getResidenceArea().contains("東京"));
+  }
+
+  // 条件指定受講生検索4
+  @Test
+  void 条件指定受講生検索_検索条件に前3条件を指定して想定通り検索できること() {
+    criteria.setFullName("田");
+    criteria.setFullNameKana("タロウ");
+    criteria.setResidenceArea("東京");
+    List<Student> actual = sut.searchStudentsByCriteria(criteria);
+
+    assertThat(actual).hasSize(1);
+    assertThat(actual).allMatch(student -> student.getResidenceArea().contains("東京"));
+  }
+
+  //　条件指定受講生検索5
+  @Test
+  void 条件指定受講生検索_条件未指定で論理削除を除く全件取得できること() {
+    List<Student> actual = sut.searchStudentsByCriteria(criteria);
     boolean containsDeleted = actual.stream()
         .anyMatch(student -> student.getStudentId() == 4);
     assertThat(containsDeleted).isFalse();
   }
 
-  //受講コース情報一覧検索
+  //　条件指定受講生検索6
   @Test
-  void 受講コース情報の全件を検索できること() {
-    List<StudentCourse> actual = sut.searchStudentsCourses();
-    assertThat(actual.size()).isEqualTo(6);
+  void 条件指定受講生検索_条件を満たす受講生がいない場合に空リストが返ること() {
+    criteria.setFullName("佐々木");
+    List<Student> actual = sut.searchStudentsByCriteria(criteria);
+    assertThat(actual).isEmpty();
   }
 
-  //受講コース情報一覧検索
+  // 条件指定受講コース検索1
   @Test
-  void 全件取得でcourse_statusが全て取得できること() {
-    List<CourseStatus> actual = sut.searchCoursesStatus();
-    assertThat(actual.size()).isEqualTo(6);
+  void 条件指定検索_検索条件にコース名を指定して想定通り検索できること() {
+    criteria.setCourse("English");
+    List<StudentCourse> actual = sut.searchStudentsCoursesByCriteria(criteria);
+
+    assertThat(actual).hasSize(2);
+    assertThat(actual).allMatch(student -> student.getCourse().contains("English"));
+  }
+
+  // 条件指定受講コース検索2
+  @Test
+  void 条件指定受講生検索_条件を満たす受講コースがいない場合に空リストが返ること() {
+    criteria.setCourse("Chinese");
+    List<StudentCourse> actual = sut.searchStudentsCoursesByCriteria(criteria);
+    assertThat(actual).isEmpty();
+  }
+
+  // 条件指定コース申込状況検索1
+  @Test
+  void 条件指定検索_検索条件に申込状況を指定して想定通り検索できること() {
+    criteria.setStatus("仮申込");
+    List<CourseStatus> actual = sut.searchCourseStatusesByCriteria(criteria);
+
+    assertThat(actual).hasSize(2);
+    assertThat(actual).allMatch(student -> student.getStatus().contains("仮申込"));
+  }
+
+  // 条件指定コース申込状況検索2
+  @Test
+  void 条件指定受講生検索_条件を満たす申込状況がいない場合に空リストが返ること() {
+    criteria.setStatus("Chinese");
+    List<CourseStatus> actual = sut.searchCourseStatusesByCriteria(criteria);
+    assertThat(actual).isEmpty();
   }
 
   //StudentIdに基づく受講生情報検索①
@@ -57,7 +131,6 @@ class StudentRepositoryTest {
     assertThat(actual)
         .extracting(Student::getFullName, Student::getFullNameKana, Student::getMailAddress)
         .containsExactly("山田_花子", "ヤマダ_ハナコ", "yamada_hanako@gmail.com");
-
   }
 
   //StudentIdに基づく受講生情報検索②
@@ -149,8 +222,9 @@ class StudentRepositoryTest {
 
   @Test
   void コース申込状況を新規登録できること() {
+    Integer courseId = 7;
     LocalDate today = LocalDate.now();
-    CourseStatus courseStatus = TestDataFactory.createInitCourseStatus(null, 2);
+    CourseStatus courseStatus = TestDataFactory.createInitCourseStatus(null, courseId);
 
     sut.registerCourseStatus(courseStatus);
 
@@ -158,18 +232,16 @@ class StudentRepositoryTest {
     assertThat(courseStatus.getCourseStatusId()).isNotNull();
 
     // IDが割り当てられたことを前提に検索・内容を検証
-    CourseStatus actual = sut.searchCoursesStatus().stream()
-        .filter(cs -> cs.getCourseStatusId().equals(courseStatus.getCourseStatusId()))
-        .findFirst()
-        .orElseThrow();
-
-    assertThat(actual)
+    List<CourseStatus> actualList = sut.searchCourseStatusByCourseIdList(List.of(courseId));
+    assertThat(actualList)
+        .hasSize(1)
+        .first()
         .extracting(
             CourseStatus::getCourseId,
             CourseStatus::getStatus,
             CourseStatus::getProvisionalApplicationDate
         )
-        .containsExactly(2, "仮申込", today);
+        .containsExactly(courseId, "仮申込", today);
   }
 
   //受講生更新処理
@@ -220,10 +292,9 @@ class StudentRepositoryTest {
 
   @Test
   void 受講コース申込状況の更新が行えること() {
-    CourseStatus courseStatus = sut.searchCoursesStatus().stream()
-        .filter(cs -> cs.getCourseStatusId().equals(2))
-        .findFirst()
-        .orElseThrow();
+    List<CourseStatus> courseStatusList = sut.searchCourseStatusByCourseIdList(List.of(2));
+    assertThat(courseStatusList).hasSize(1);
+    CourseStatus courseStatus = courseStatusList.getFirst();
 
     courseStatus.setStatus("受講完了");
     courseStatus.setCancelDate(LocalDate.of(2025, 4, 15));
@@ -232,10 +303,9 @@ class StudentRepositoryTest {
     sut.updateCourseStatus(courseStatus);
 
     // 更新後のデータを再取得して検証
-    CourseStatus actual = sut.searchCoursesStatus().stream()
-        .filter(cs -> cs.getCourseStatusId().equals(2))
-        .findFirst()
-        .orElseThrow();
+    List<CourseStatus> updatedList = sut.searchCourseStatusByCourseIdList(List.of(2));
+    assertThat(updatedList).hasSize(1);
+    CourseStatus actual = updatedList.getFirst();
 
     assertThat(actual)
         .extracting(

@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -30,6 +31,7 @@ import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.domain.criteria.StudentDetailSearchCriteria;
 import raisetech.StudentManagement.service.StudentService;
 import raisetech.StudentManagement.validation.StudentValidation.OnRegisterStudent;
 import raisetech.StudentManagement.validation.StudentValidation.OnUpdate;
@@ -294,4 +296,31 @@ class StudentControllerValidationTest {
             "過去または現在の日付を入力してください。")
     );
   }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"仮申込", "本申込", "受講中", "受講完了", "キャンセル"})
+  void 検索条件_バリデーション正常動作テスト(String status) {
+    StudentDetailSearchCriteria criteria = new StudentDetailSearchCriteria();
+    criteria.setStatus(status);
+
+    Set<ConstraintViolation<StudentDetailSearchCriteria>> violations = validator.validate(criteria);
+
+    assertThat(violations).isEmpty();
+  }
+
+  @Test
+  void 検索条件_バリデーション異常動作テスト() {
+    StudentDetailSearchCriteria criteria = new StudentDetailSearchCriteria();
+    criteria.setStatus("仮申込み");
+
+    Set<ConstraintViolation<StudentDetailSearchCriteria>> violations = validator.validate(criteria);
+
+    assertThat(violations.size()).isEqualTo(1);
+
+    assertThat(violations)
+        .extracting(ConstraintViolation::getMessage)
+        .containsOnly("仮申込,本申込,受講中,受講完了,キャンセル のいずれかを入力してください");
+  }
+
+
 }

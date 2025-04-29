@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.criteria.StudentDetailSearchCriteria;
 
 /**
  * Repository: 受講生 (`students`) および受講コース (`students_courses`) テーブルへのアクセスを提供するリポジトリ。
@@ -14,25 +15,25 @@ import raisetech.StudentManagement.data.StudentCourse;
 public interface StudentRepository {
 
   /**
-   * 受講生情報の一覧を取得します。 除外対象:キャンセル扱い（`isDeleted=true`）の受講生は除外されます。
+   * 指定条件を満たす受講生情報を取得します。 除外対象:キャンセル扱い（`isDeleted=true`）の受講生は検索対象外。
    *
-   * @return 受講生の一覧(キャンセル扱いの受講生を除く)
+   * @return 受講生の条件検索結果一覧(キャンセル扱いの受講生は対象外)
    */
-  List<Student> searchStudents();
+  List<Student> searchStudentsByCriteria(StudentDetailSearchCriteria criteria);
 
   /**
-   * 受講コース情報の一覧を取得します。
+   * 指定条件を満たす受講生情報を取得します。 除外対象:キャンセル扱い（`isDeleted=true`）の受講生は検索対象外。
    *
-   * @return 受講コースの一覧(全件)
+   * @return 受講生の条件検索結果一覧(キャンセル扱いの受講生は対象外)
    */
-  List<StudentCourse> searchStudentsCourses();
+  List<StudentCourse> searchStudentsCoursesByCriteria(StudentDetailSearchCriteria criteria);
 
   /**
-   * 受講コースの申込状況の一覧を取得します。
+   * 指定条件を満たす受講生情報を取得します。 除外対象:キャンセル扱い（`isDeleted=true`）の受講生は検索対象外。
    *
-   * @return 受講コースの申込状況の一覧(全件)
+   * @return 受講生の条件検索結果一覧(キャンセル扱いの受講生は対象外)
    */
-  List<CourseStatus> searchCoursesStatus();
+  List<CourseStatus> searchCourseStatusesByCriteria(StudentDetailSearchCriteria criteria);
 
   /**
    * 指定された `studentId` に紐づく受講生情報を取得します。
@@ -99,4 +100,5 @@ public interface StudentRepository {
    * @param CourseStatus 更新する受講コース情報
    */
   void updateCourseStatus(CourseStatus CourseStatus);
+
 }

@@ -3,19 +3,47 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="raisetech.StudentManagement.repository.StudentRepository">
 
-  <!-- 受講生情報の一覧を取得（キャンセル扱いの受講生は除外） -->
-  <select id="searchStudents" resultType="raisetech.StudentManagement.data.Student">
-    SELECT * FROM students WHERE is_deleted = false
+  <!-- 指定条件を満たす受講生情報の一覧を取得 -->
+  <select id="searchStudentsByCriteria"
+    parameterType="raisetech.StudentManagement.domain.criteria.StudentDetailSearchCriteria"
+    resultType="raisetech.StudentManagement.data.Student">
+    SELECT * FROM students
+    <where>
+      is_deleted = false
+      <if test="fullName != null and fullName != ''">
+        AND full_name LIKE CONCAT('%', #{fullName}, '%')
+      </if>
+      <if test="fullNameKana != null and fullNameKana != ''">
+        AND full_name_kana LIKE CONCAT('%', #{fullNameKana}, '%')
+      </if>
+      <if test="residenceArea != null and residenceArea != ''">
+        AND residence_area LIKE CONCAT('%', #{residenceArea}, '%')
+      </if>
+    </where>
   </select>
 
-  <!-- 受講コース情報の一覧を取得 -->
-  <select id="searchStudentsCourses" resultType="raisetech.StudentManagement.data.StudentCourse">
+  <!-- 指定条件を満たす受講コース情報の一覧を取得 -->
+  <select id="searchStudentsCoursesByCriteria"
+    parameterType="raisetech.StudentManagement.domain.criteria.StudentDetailSearchCriteria"
+    resultType="raisetech.StudentManagement.data.StudentCourse">
     SELECT * FROM students_courses
+    <where>
+      <if test="course != null and course != ''">
+        AND course LIKE CONCAT('%', #{course}, '%')
+      </if>
+    </where>
   </select>
 
-  <!-- 受講コース申込状況の一覧を取得 -->
-  <select id="searchCoursesStatus" resultType="raisetech.StudentManagement.data.CourseStatus">
+  <!-- 指定条件を満たすコース申込状況の一覧を取得 -->
+  <select id="searchCourseStatusesByCriteria"
+    parameterType="raisetech.StudentManagement.domain.criteria.StudentDetailSearchCriteria"
+    resultType="raisetech.StudentManagement.data.CourseStatus">
     SELECT * FROM course_status
+    <where>
+      <if test="status != null and status != ''">
+        AND status LIKE CONCAT('%', #{status}, '%')
+      </if>
+    </where>
   </select>
 
   <!-- studentId に紐づく受講生情報を取得 -->
@@ -33,8 +61,7 @@
   <!-- courseId に紐づく受講コース申込状況を取得 -->
   <select id="searchCourseStatusByCourseIdList" parameterType="list"
     resultType="raisetech.StudentManagement.data.CourseStatus">
-    SELECT *
-    FROM course_status
+    SELECT * FROM course_status
     WHERE course_id IN
     <foreach collection="list" item="id" open="(" separator="," close=")">
       #{id}

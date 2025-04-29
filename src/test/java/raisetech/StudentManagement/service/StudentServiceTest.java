@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -32,6 +34,7 @@ import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.domain.criteria.StudentDetailSearchCriteria;
 import raisetech.StudentManagement.repository.StudentRepository;
 import raisetech.StudentManagement.service.converter.StudentConverter;
 
@@ -100,23 +103,94 @@ class StudentServiceTest {
     return Stream.of(null, Collections.emptyList());
   }
 
+  //受講生条件検索1
   @Test
-  void 受講生詳細情報の一覧検索_repositoryとconverterの処理が適切に呼び出せていること() {
-    when(repository.searchStudents()).thenReturn(List.of(student));
-    when(repository.searchStudentsCourses()).thenReturn(studentCourseList);
-    when(repository.searchCoursesStatus()).thenReturn(courseStatusList);
-    when(converter.convertCourseDetailList(studentCourseList, courseStatusList)).thenReturn(
+  void 検索条件に該当する受講生詳細情報の一覧が正しく取得できること() {
+    StudentDetailSearchCriteria criteria = new StudentDetailSearchCriteria();
+
+    when(repository.searchStudentsByCriteria(criteria)).thenReturn(List.of(student));
+    when(repository.searchStudentsCoursesByCriteria(criteria)).thenReturn(studentCourseList);
+    when(repository.searchCourseStatusesByCriteria(criteria)).thenReturn(courseStatusList);
+    when(converter.combineStudentCourseWithCourseStatusByCourseId(studentCourseList,
+        courseStatusList))
+        .thenReturn(courseDetailList);
+    when(converter.combineStudentsWithCourseDetailsByStudentId(List.of(student), courseDetailList))
+        .thenReturn(List.of(studentDetail));
+
+    List<StudentDetail> actual = sut.searchStudentDetailListByCriteria(criteria);
+
+    assertEquals(1, actual.size());
+    assertEquals(studentDetail, actual.getFirst());
+
+    verify(repository, times(1)).searchStudentsByCriteria(criteria);
+    verify(repository, times(1)).searchStudentsCoursesByCriteria(criteria);
+    verify(repository, times(1)).searchCourseStatusesByCriteria(criteria);
+    verify(converter, times(1)).combineStudentCourseWithCourseStatusByCourseId(
+        studentCourseList, courseStatusList);
+    verify(converter, times(1)).combineStudentsWithCourseDetailsByStudentId(List.of(student),
         courseDetailList);
-    when(converter.convertStudentDetailList(List.of(student), courseDetailList)).thenReturn(
-        List.of(studentDetail));
+  }
 
-    List<StudentDetail> actual = sut.getStudentDetailList();
+  //受講生条件検索2
+  @ParameterizedTest
+  @MethodSource("provideEachLists")
+  void 検索結果が空のテーブルがあった場合にrepositoryは実行されconverterは実行されずに空リストが返ること(
+      List<Student> studentList,
+      List<StudentCourse> studentCourseList,
+      List<CourseStatus> courseStatusList) {
+    StudentDetailSearchCriteria criteria = new StudentDetailSearchCriteria();
 
-    verify(repository, times(1)).searchStudents();
-    verify(repository, times(1)).searchStudentsCourses();
-    verify(repository, times(1)).searchCoursesStatus();
-    verify(converter, times(1)).convertCourseDetailList(studentCourseList, courseStatusList);
-    verify(converter, times(1)).convertStudentDetailList(List.of(student), courseDetailList);
+    when(repository.searchStudentsByCriteria(criteria)).thenReturn(studentList);
+    when(repository.searchStudentsCoursesByCriteria(criteria)).thenReturn(studentCourseList);
+    when(repository.searchCourseStatusesByCriteria(criteria)).thenReturn(courseStatusList);
+
+    List<StudentDetail> actual = sut.searchStudentDetailListByCriteria(criteria);
+
+    assertEquals(Collections.emptyList(), actual);
+
+    verify(repository, times(1)).searchStudentsByCriteria(criteria);
+    verify(repository, times(1)).searchStudentsCoursesByCriteria(criteria);
+    verify(repository, times(1)).searchCourseStatusesByCriteria(criteria);
+    verify(converter, never()).combineStudentCourseWithCourseStatusByCourseId(anyList(), anyList());
+    verify(converter, never()).combineStudentsWithCourseDetailsByStudentId(anyList(), anyList());
+  }
+
+  // 受講生条件検索2 テストケース
+  static Stream<Arguments> provideEachLists() {
+    Student student = createStudentNormalSimple(999);
+    StudentCourse studentCourse = createStudentCourseNormalSimple(999, 999);
+    CourseStatus courseStatus = createInitCourseStatus(999, 999);
+    return Stream.of(
+        Arguments.of(Collections.emptyList(), List.of(studentCourse), List.of(courseStatus)),
+        Arguments.of(List.of(student), Collections.emptyList(), List.of(courseStatus)),
+        Arguments.of(List.of(student), List.of(studentCourse), Collections.emptyList())
+    );
+  }
+
+  //受講生条件検索3
+  @Test
+  void 該当する検索条件を満たすCourseDetailがない場合に全てのrepositoryと適切なconverterのみ実行され空リストが返ること() {
+    StudentDetailSearchCriteria criteria = new StudentDetailSearchCriteria();
+    List<StudentCourse> studentCourseList = List.of(course1);
+    List<CourseStatus> courseStatusList = List.of(initStatus2);
+
+    when(repository.searchStudentsByCriteria(criteria)).thenReturn(List.of(student));
+    when(repository.searchStudentsCoursesByCriteria(criteria)).thenReturn(studentCourseList);
+    when(repository.searchCourseStatusesByCriteria(criteria)).thenReturn(courseStatusList);
+    when(converter.combineStudentCourseWithCourseStatusByCourseId(studentCourseList,
+        courseStatusList))
+        .thenReturn(Collections.emptyList());
+
+    List<StudentDetail> actual = sut.searchStudentDetailListByCriteria(criteria);
+
+    assertEquals(Collections.emptyList(), actual);
+
+    verify(repository, times(1)).searchStudentsByCriteria(criteria);
+    verify(repository, times(1)).searchStudentsCoursesByCriteria(criteria);
+    verify(repository, times(1)).searchCourseStatusesByCriteria(criteria);
+    verify(converter, times(1)).combineStudentCourseWithCourseStatusByCourseId(studentCourseList,
+        courseStatusList);
+    verify(converter, never()).combineStudentsWithCourseDetailsByStudentId(anyList(), anyList());
   }
 
   @Test
@@ -294,4 +368,6 @@ class StudentServiceTest {
     assertNotNull(actual);
     assertTrue(actual.isEmpty());
   }
+
+
 }
