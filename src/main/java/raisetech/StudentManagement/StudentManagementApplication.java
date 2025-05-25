@@ -2,6 +2,7 @@ package raisetech.StudentManagement;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,7 +60,7 @@ public class StudentManagementApplication {
   @PutMapping("/studentInfo")
   public void putUpdateStudentInfo(Integer key, String name, Integer age) {
     Student target = student.get(key);
-    if (target != null) {
+    if (Objects.nonNull(target)) {
       target.setName(name);
       target.setAge(age);
     }
@@ -69,10 +70,13 @@ public class StudentManagementApplication {
   @PatchMapping("/studentInfo")
   public void patchUpdateStudentInfo(Integer key, String name, Integer age) {
     Student target = student.get(key);
-    if (target != null && name != null) {
+    if (Objects.isNull(target)) {
+      return;
+    }
+    if (Objects.nonNull(name)) {
       target.setName(name);
     }
-    if (target != null && age != null) {
+    if (Objects.nonNull(age)) {
       target.setAge(age);
     }
   }
