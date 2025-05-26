@@ -1,83 +1,83 @@
 package raisetech.StudentManagement;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @RestController
 public class StudentManagementApplication {
 
-  private String name = "Enami Koji";
-  private Integer age = 30;
-  private Map<Integer, Student> student = new HashMap<>();
-
-  //初期はMapに1件のデータが入っている。
-  {
-    student.put(1, new Student("Enami Koji", 30));
-  }
+  @Autowired
+  public StudentRepository repository;
 
   public static void main(String[] args) {
     SpringApplication.run(StudentManagementApplication.class, args);
   }
 
-  @GetMapping("/studentInfo")
-  public Map<Integer, Student> getStudentInfo() {
-    return student;
+  @GetMapping("/studentList")
+  public List<Student> getStudentList() {
+    return repository.searchStudentList();
+  }
+
+  @GetMapping("/student")
+  public Student getStudentById(@RequestParam String studentId) {
+    return repository.searchStudentById(studentId);
   }
 
   //新規受講生の登録
-  @PostMapping("/studentInfo")
-  public void addStudentInfo(String name, Integer age) {
+  @PostMapping("/student")
+  public void registerStudent(String name, String kanaName, Integer age) {
     //キーを作成
-    int newKey = student.keySet().stream()
-        .mapToInt(Integer::intValue)
+    List<Student> studentList = repository.searchStudentList();
+    int newKey = studentList.stream()
+        .map(Student::getStudentId)
+        .filter(id -> id.matches("\\d+"))
+        .mapToInt(Integer::parseInt)
         .max()
         .orElse(0) + 1;
-    Student newStudent = new Student(name, age);
-    student.put(newKey, newStudent);
+    Student newStudent = new Student(String.valueOf(newKey), name, kanaName, age);
+    repository.registerStudent(newStudent);
   }
 
   //引数Studentで登録処理ver.
-  @PostMapping("/studentInfoByStudent")
-  public void addStudentInfoByStudent(Student newStudent) {
+  @PostMapping("/studentByStudent")
+  public void registerStudentByStudent(Student newStudent) {
     //キーを作成
-    int newKey = student.keySet().stream()
-        .mapToInt(Integer::intValue)
+    List<Student> studentList = repository.searchStudentList();
+    int newKey = studentList.stream()
+        .map(Student::getStudentId)
+        .filter(id -> id.matches("\\d+"))
+        .mapToInt(Integer::parseInt)
         .max()
         .orElse(0) + 1;
-    student.put(newKey, newStudent);
+    newStudent.setStudentId(String.valueOf(newKey));
+    repository.registerStudent(newStudent);
   }
 
   //keyを参照し対象の受講生情報を更新
-  @PutMapping("/studentInfo")
-  public void putUpdateStudentInfo(Integer key, String name, Integer age) {
-    Student target = student.get(key);
-    if (Objects.nonNull(target)) {
-      target.setName(name);
-      target.setAge(age);
-    }
+  @PutMapping("/student")
+  public void putUpdateStudent(String studentId, String name, String kanaName, Integer age) {
+    repository.putUpdateStudent(studentId, name, kanaName, age);
   }
 
   //keyを参照し対象の受講生情報を部分更新
-  @PatchMapping("/studentInfo")
-  public void patchUpdateStudentInfo(Integer key, String name, Integer age) {
-    Student target = student.get(key);
-    if (Objects.isNull(target)) {
-      return;
-    }
-    if (Objects.nonNull(name)) {
-      target.setName(name);
-    }
-    if (Objects.nonNull(age)) {
-      target.setAge(age);
-    }
+  @PatchMapping("/student")
+  public void patchUpdateStudent(String studentId, String name, String kanaName, Integer age) {
+    repository.patchUpdateStudent(studentId, name, kanaName, age);
+
+  }
+
+  @DeleteMapping("/student")
+  public void deleteStudent(String studentId) {
+    repository.deleteStudent(studentId);
   }
 }
