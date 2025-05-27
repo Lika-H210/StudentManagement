@@ -36,39 +36,39 @@ public class StudentManagementApplication {
   //新規受講生の登録
   @PostMapping("/student")
   public void registerStudent(String name, String kanaName, Integer age) {
-    //キーを作成
+    //studentIdを作成
     List<Student> studentList = repository.searchStudentList();
-    int newKey = studentList.stream()
+    int studentId = studentList.stream()
         .map(Student::getStudentId)
         .filter(id -> id.matches("\\d+"))
         .mapToInt(Integer::parseInt)
         .max()
         .orElse(0) + 1;
-    repository.registerStudent(String.valueOf(newKey), name, kanaName, age);
+    repository.registerStudent(String.valueOf(studentId), name, kanaName, age);
   }
 
   //引数Studentで登録処理ver.
   @PostMapping("/studentByStudent")
   public void registerStudentByStudent(Student newStudent) {
-    //キーを作成
+    //studentIdを作成
     List<Student> studentList = repository.searchStudentList();
-    int newKey = studentList.stream()
+    int studentId = studentList.stream()
         .map(Student::getStudentId)
         .filter(id -> id.matches("\\d+"))
         .mapToInt(Integer::parseInt)
         .max()
         .orElse(0) + 1;
-    newStudent.setStudentId(String.valueOf(newKey));
+    newStudent.setStudentId(String.valueOf(studentId));
     repository.registerStudentByStudent(newStudent);
   }
 
-  //keyを参照し対象の受講生情報を更新
+  //対象の受講生情報を更新
   @PutMapping("/student")
   public void putUpdateStudent(String studentId, String name, String kanaName, Integer age) {
     repository.putUpdateStudent(studentId, name, kanaName, age);
   }
 
-  //keyを参照し対象の受講生情報を部分更新
+  //対象の受講生情報を部分更新
   @PatchMapping("/student")
   public void patchUpdateStudent(String studentId, String name, String kanaName, Integer age) {
     repository.patchUpdateStudent(studentId, name, kanaName, age);
