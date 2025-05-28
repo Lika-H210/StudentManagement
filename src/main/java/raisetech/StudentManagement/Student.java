@@ -1,52 +1,25 @@
 package raisetech.StudentManagement;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.Getter;
+import lombok.Setter;
 
-@JsonPropertyOrder({"studentId", "name", "kanaName", "age"}) //項目の表示順を固定
+@Getter
+@Setter
 public class Student {
 
-  private String studentId;
-  private String name;
+  //studentId必須 PRIKEY
+  private Integer studentId;
+  //publicId必須 UNIKEY
+  private String publicId;
+  //fullName必須
+  private String fullName;
+  //kanaName必須
   private String kanaName;
+  private String nickname;
+  //email必須 UNIKEY
+  private String email;
+  private String region;
   private Integer age;
+  private String sex;
 
-
-  public Student(String studentId, String name, String kanaName, Integer age) {
-    this.studentId = studentId;
-    this.name = name;
-    this.kanaName = kanaName;
-    this.age = age;
-  }
-  
-  public String getStudentId() {
-    return studentId;
-  }
-
-  public void setStudentId(String studentId) {
-    this.studentId = studentId;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getKanaName() {
-    return kanaName;
-  }
-
-  public void setKanaName(String kanaName) {
-    this.kanaName = kanaName;
-  }
-
-  public Integer getAge() {
-    return age;
-  }
-
-  public void setAge(Integer age) {
-    this.age = age;
-  }
 }

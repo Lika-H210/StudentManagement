@@ -11,9 +11,6 @@ public interface StudentRepository {
   List<Student> searchStudentList();
 
   @Select("SELECT * FROM student WHERE student_id = #{studentId}")
-  Student searchStudentById(String studentId);
-
-
-
+  Student searchStudentById(Integer studentId);
 
 }

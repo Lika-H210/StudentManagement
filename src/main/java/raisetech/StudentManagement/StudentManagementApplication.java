@@ -25,13 +25,8 @@ public class StudentManagementApplication {
   }
 
   @GetMapping("/student")
-  public Student getStudentById(@RequestParam String studentId) {
+  public Student getStudentById(@RequestParam Integer studentId) {
     return repository.searchStudentById(studentId);
-  }
-
-
-
-
   }
 
 }
