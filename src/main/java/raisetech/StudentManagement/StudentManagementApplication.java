@@ -24,9 +24,15 @@ public class StudentManagementApplication {
     return repository.searchStudentList();
   }
 
+  //todo:引数をpublicIdに変更する
   @GetMapping("/student")
   public Student getStudentById(@RequestParam Integer studentId) {
     return repository.searchStudentById(studentId);
+  }
+
+  @GetMapping("/studentCourseList")
+  public List<StudentCourse> getStudentCourseList() {
+    return repository.searchStudentCourseList();
   }
 
 }

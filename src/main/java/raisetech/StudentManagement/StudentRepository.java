@@ -7,10 +7,14 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface StudentRepository {
 
-  @Select("SELECT * FROM student")
+  @Select("SELECT * FROM students")
   List<Student> searchStudentList();
 
-  @Select("SELECT * FROM student WHERE student_id = #{studentId}")
+  //todo:引数をpublicIdに変更する
+  @Select("SELECT * FROM students WHERE student_id = #{studentId}")
   Student searchStudentById(Integer studentId);
+
+  @Select("SELECT * FROM students_courses")
+  List<StudentCourse> searchStudentCourseList();
 
 }

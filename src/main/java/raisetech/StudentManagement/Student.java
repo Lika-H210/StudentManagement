@@ -9,7 +9,7 @@ public class Student {
 
   //studentId必須 PRIKEY
   private Integer studentId;
-  //publicId必須 UNIKEY
+  //publicId必須 UNIKEY　(UUID)
   private String publicId;
   //fullName必須
   private String fullName;
