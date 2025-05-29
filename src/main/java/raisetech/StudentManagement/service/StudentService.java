@@ -18,7 +18,10 @@ public class StudentService {
   }
 
   public List<Student> searchStudentList() {
-    return repository.searchStudentList();
+    List<Student> studentList = repository.searchStudentList();
+    return studentList.stream()
+        .filter(student -> student.getAge() >= 30 && student.getAge() < 40)
+        .toList();
   }
 
   //todo:引数をpublicIdに変更する
@@ -27,7 +30,10 @@ public class StudentService {
   }
 
   public List<StudentCourse> searchStudentCourseList() {
-    return repository.searchStudentCourseList();
+    List<StudentCourse> courseList = repository.searchStudentCourseList();
+    return courseList.stream()
+        .filter(course -> course.getCourse().equals("Java"))
+        .toList();
   }
 
 
