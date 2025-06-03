@@ -54,7 +54,7 @@ public class StudentController {
     if (result.hasErrors() || !studentDetail.getStudent().getFullName().contains(" ")) {
       return "registerStudent";
     }
-    service.registerStudent(studentDetail);
+    service.registerStudentDetail(studentDetail);
     return "redirect:/studentList";
   }
 
