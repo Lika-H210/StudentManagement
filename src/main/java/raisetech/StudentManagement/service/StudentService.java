@@ -1,10 +1,12 @@
 package raisetech.StudentManagement.service;
 
 import java.util.List;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import raisetech.StudentManagement.date.Student;
 import raisetech.StudentManagement.date.StudentCourse;
+import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.repository.StudentRepository;
 
 @Service
@@ -30,5 +32,10 @@ public class StudentService {
     return repository.searchStudentById(studentId);
   }
 
+  public void registerStudent(StudentDetail studentDetail) {
+    UUID uuid = UUID.randomUUID();
+    studentDetail.getStudent().setPublicId(uuid.toString());
+    repository.registerStudent(studentDetail.getStudent());
+  }
 
 }
