@@ -1,0 +1,18 @@
+.studentTable {
+  border-collapse: collapse;
+  width: 95%;
+  margin: 0 auto;
+  font-size: 15px
+}
+
+.studentTable th,
+.studentTable td {
+  border: 1px solid #ccc;
+  padding: 5px;
+  text-align: left;
+}
+
+.studentTable thead {
+  background-color: #191970;
+  color: white;
+}
