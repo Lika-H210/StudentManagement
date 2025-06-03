@@ -3,46 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <title>受講生登録</title>
+  <link th:href="@{/css/style.css}" rel="stylesheet"/>
 </head>
 <body>
 <h2>受講生情報登録フォーム</h2>
 
-<form th:action="@{/registerStudent}" th:object="${studentDetail}" method="post">
+<form th:action="@{/registerStudent}" th:object="${studentDetail}" method="post"
+      class="registerForm">
 
-  <div>
-    <label for="fullName">名前：</label>
-    <small>※姓と名の間にスペースを入れてください。</small>
-    <input type="text" id="fullName" th:field="*{student.fullName}" required/>
+  <div class="form-group">
+    <label for="fullName" class="form-label">名前：<span class="required-label">[必須]</span></label>
+    <small class="form-note">※姓と名の間にスペースを入れてください。</small>
+    <input type="text" id="fullName" th:field="*{student.fullName}" class="form-input" required/>
   </div>
 
-  <div>
-    <label for="kanaName">名前(カナ)：</label>
-    <input type="text" id="kanaName" th:field="*{student.kanaName}" required/>
+  <div class="form-group">
+    <label for="kanaName" class="form-label">名前(カナ)：<span
+        class="required-label">[必須]</span></label>
+    <input type="text" id="kanaName" th:field="*{student.kanaName}" class="form-input" required/>
   </div>
 
-  <div>
-    <label for="nickname">ニックネーム：</label>
-    <input type="text" id="nickname" th:field="*{student.nickname}"/>
+  <div class="form-group">
+    <label for="nickname" class="form-label">ニックネーム：</label>
+    <input type="text" id="nickname" th:field="*{student.nickname}" class="form-input"/>
   </div>
 
-  <div>
-    <label for="email">メールアドレス：</label>
-    <input type="email" id="email" th:field="*{student.email}" required/>
+  <div class="form-group">
+    <label for="email" class="form-label">メールアドレス：<span class="required-label">[必須]</span></label>
+    <input type="email" id="email" th:field="*{student.email}" class="form-input" required/>
   </div>
 
-  <div>
-    <label for="region">お住まい：</label>
-    <input type="text" id="region" th:field="*{student.region}"/>
+  <div class="form-group">
+    <label for="region" class="form-label">お住まい：</label>
+    <input type="text" id="region" th:field="*{student.region}" class="form-input"/>
   </div>
 
-  <div>
-    <label for="age">年齢：</label>
-    <input type="number" id="age" th:field="*{student.age}" min="0"/>
+  <div class="form-group">
+    <label for="age" class="form-label">年齢：</label>
+    <input type="number" id="age" th:field="*{student.age}" class="form-input" min="0"/>
   </div>
 
-  <div>
-    <label for="sex">性別：</label>
-    <select id="sex" th:field="*{student.sex}">
+  <div class="form-group">
+    <label for="sex" class="form-label">性別：</label>
+    <select id="sex" th:field="*{student.sex}" class="form-select">
       <option value="">選択してください</option>
       <option value="男性">男性</option>
       <option value="女性">女性</option>
@@ -50,12 +53,12 @@
     </select>
   </div>
 
-  <div>
-    <label for="remark">備考：</label>
-    <input type="text" id="remark" th:field="*{student.remark}">
+  <div class="form-group">
+    <label for="remark" class="form-label">備考：</label>
+    <textarea id="remark" th:field="*{student.remark}" class="form-textarea"></textarea>
   </div>
 
-  <div>
+  <div class="form-submit">
     <button type="submit">登録</button>
   </div>
 
