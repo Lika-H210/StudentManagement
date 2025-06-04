@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>受講生登録</title>
+  <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+<body>
+<h2>受講生情報登録フォーム</h2>
+
+<form th:action="@{/registerStudent}" th:object="${studentDetail}" method="post"
+      class="registerForm">
+
+  <div class="form-group">
+    <label for="fullName" class="form-label">名前：<span class="required-label">[必須]</span></label>
+    <input type="text" id="fullName" th:field="*{student.fullName}" class="form-input" required/>
+  </div>
+
+  <div class="form-group">
+    <label for="kanaName" class="form-label">名前(カナ)：<span
+        class="required-label">[必須]</span></label>
+    <input type="text" id="kanaName" th:field="*{student.kanaName}" class="form-input" required/>
+  </div>
+
+  <div class="form-group">
+    <label for="nickname" class="form-label">ニックネーム：</label>
+    <input type="text" id="nickname" th:field="*{student.nickname}" class="form-input"/>
+  </div>
+
+  <div class="form-group">
+    <label for="email" class="form-label">メールアドレス：<span class="required-label">[必須]</span></label>
+    <input type="email" id="email" th:field="*{student.email}" class="form-input" required/>
+  </div>
+
+  <div class="form-group">
+    <label for="region" class="form-label">お住まい：</label>
+    <input type="text" id="region" th:field="*{student.region}" class="form-input"/>
+  </div>
+
+  <div class="form-group">
+    <label for="age" class="form-label">年齢：</label>
+    <input type="number" id="age" th:field="*{student.age}" class="form-input" min="0"/>
+  </div>
+
+  <div class="form-group">
+    <label for="sex" class="form-label">性別：</label>
+    <select id="sex" th:field="*{student.sex}" class="form-select">
+      <option value="">選択してください</option>
+      <option value="男性">男性</option>
+      <option value="女性">女性</option>
+      <option value="その他">その他</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="remark" class="form-label">備考：</label>
+    <textarea id="remark" th:field="*{student.remark}" class="form-textarea"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="course" class="form-label">受講コース名：</label>
+    <select id="course" th:field="*{studentCourseList[0].course}" class="form-select">
+      <option value="">選択してください</option>
+      <option value="Javaコース">Javaコース</option>
+      <option value="AWSコース">AWSコース</option>
+      <option value="Java Scriptコース">Java Scriptコース</option>
+      <option value="AIコース">AIコース</option>
+      <option value="英会話コース">英会話コース</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="startDate" class="form-label">受講開始日：</label>
+    <input type="date" id="startDate" th:field="*{studentCourseList[0].startDate}"
+           class="form-input"/>
+  </div>
+
+  <div class="form-submit">
+    <button type="submit">登録</button>
+  </div>
+
+</form>
+</body>
+</html>
