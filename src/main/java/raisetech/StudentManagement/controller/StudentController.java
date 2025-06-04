@@ -51,9 +51,7 @@ public class StudentController {
 
   @PostMapping("/registerStudent")
   public String registerStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
-    if (result.hasErrors() || !studentDetail.getStudent().getFullName().contains(" ")) {
-      return "registerStudent";
-    }
+    //Todo:バリデーションerror時の動作を入れる（バリデーション確認の機能実装後対応）
     service.registerStudentDetail(studentDetail);
     return "redirect:/studentList";
   }
