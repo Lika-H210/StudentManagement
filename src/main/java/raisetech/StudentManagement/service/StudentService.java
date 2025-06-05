@@ -29,9 +29,11 @@ public class StudentService {
     return repository.searchStudentCourseList();
   }
 
-  //todo:引数をpublicIdに変更する
-  public Student searchStudentById(Integer studentId) {
-    return repository.searchStudentById(studentId);
+  public StudentDetail searchStudentDetailByPublicId(String publicId) {
+    Student student = repository.searchStudentByPublicId(publicId);
+    List<StudentCourse> studentCourseList = repository.searchStudentCourseListByStudentId(
+        student.getStudentId());
+    return new StudentDetail(student, studentCourseList);
   }
 
   @Transactional

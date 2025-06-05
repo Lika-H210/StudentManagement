@@ -7,8 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
 import raisetech.StudentManagement.date.Student;
 import raisetech.StudentManagement.date.StudentCourse;
@@ -37,10 +37,11 @@ public class StudentController {
     return "studentList";
   }
 
-  //todo:引数をpublicIdに変更する
-  @GetMapping("/student")
-  public Student getStudentById(@RequestParam Integer studentId) {
-    return service.searchStudentById(studentId);
+  @GetMapping("/student/{publicId}")
+  public String getStudentByPublicId(@PathVariable String publicId, Model model) {
+    StudentDetail studentDetail = service.searchStudentDetailByPublicId(publicId);
+    model.addAttribute("studentDetail", studentDetail);
+    return "student";
   }
 
   @GetMapping("/newStudent")

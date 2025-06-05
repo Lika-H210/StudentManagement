@@ -17,9 +17,11 @@ public interface StudentRepository {
   @Select("SELECT * FROM students_courses")
   List<StudentCourse> searchStudentCourseList();
 
-  //todo:引数をpublicIdに変更する
-  @Select("SELECT * FROM students WHERE student_id = #{studentId}")
-  Student searchStudentById(Integer studentId);
+  @Select("SELECT * FROM students WHERE public_id = #{publicId}")
+  Student searchStudentByPublicId(String publicId);
+
+  @Select("SELECT * FROM students_courses WHERE student_id = #{studentId}")
+  List<StudentCourse> searchStudentCourseListByStudentId(Integer studentId);
 
   @Insert(
       "INSERT INTO students (public_id, full_name, kana_name, nickname, email, region, age, sex, remark, is_deleted)"
