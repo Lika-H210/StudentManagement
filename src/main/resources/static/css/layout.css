@@ -1,0 +1,16 @@
+
+.student-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color:#EEFFFF;
+  color: #333;
+}
+
+.updateStudent-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color:#EEFFFF;
+  color: #333;
+}

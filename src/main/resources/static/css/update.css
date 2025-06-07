@@ -1,0 +1,12 @@
+
+.student-table thead th.update-col,
+.student-course-table thead th.update-col {
+  background-color: #BAD3FF;
+  color: #000;
+}
+
+.student-table td.update-col,
+.student-course-table td.update-col {
+  background-color: #FFFFDD;
+  color: #333;
+}

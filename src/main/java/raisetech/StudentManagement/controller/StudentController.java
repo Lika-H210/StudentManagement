@@ -7,8 +7,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
 import raisetech.StudentManagement.date.Student;
 import raisetech.StudentManagement.date.StudentCourse;
@@ -37,10 +38,26 @@ public class StudentController {
     return "studentList";
   }
 
-  //todo:引数をpublicIdに変更する
-  @GetMapping("/student")
-  public Student getStudentById(@RequestParam Integer studentId) {
-    return service.searchStudentById(studentId);
+  @GetMapping("/student/{publicId}")
+  public String getStudentByPublicId(@PathVariable String publicId, Model model) {
+    StudentDetail studentDetail = service.searchStudentDetailByPublicId(publicId);
+    model.addAttribute("studentDetail", studentDetail);
+    return "student";
+  }
+
+  @GetMapping("/student/{publicId}/edit")
+  public String editStudent(@PathVariable String publicId, Model model) {
+    StudentDetail studentDetail = service.searchStudentDetailByPublicId(publicId);
+    model.addAttribute("studentDetail", studentDetail);
+    return "updateStudent";
+  }
+
+  @PostMapping("/updateStudent")
+  public String updateStudent(@ModelAttribute StudentDetail studentDetail,
+      RedirectAttributes redirectAttributes) {
+    service.updateStudentDetail(studentDetail);
+    redirectAttributes.addAttribute("publicId", studentDetail.getStudent().getPublicId());
+    return "redirect:/student/{publicId}";
   }
 
   @GetMapping("/newStudent")

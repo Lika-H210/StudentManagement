@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>受講生詳細情報</title>
+  <link rel="stylesheet" href="/css/layout.css"/>
+  <link rel="stylesheet" href="/css/base-tables.css"/>
+  <link rel="stylesheet" href="/css/compornents.css"/>
+</head>
+<body>
+<main class="student-container">
+  <h2>受講生詳細情報</h2>
+  <h3>受講生情報</h3>
+  <table class="student-table">
+    <tbody>
+    <tr>
+      <th>ID</th>
+      <td th:text="${studentDetail.student.publicId}">a1b2c3d4</td>
+    </tr>
+    <tr>
+      <th>名前</th>
+      <td th:text="${studentDetail.student.fullName}">山田 太郎</td>
+    </tr>
+    <tr>
+      <th>カナ</th>
+      <td th:text="${studentDetail.student.kanaName}">ヤマダ タロウ</td>
+    </tr>
+    <tr>
+      <th>ニックネーム</th>
+      <td th:text="${studentDetail.student.nickname}">たろちゃん</td>
+    </tr>
+    <tr>
+      <th>メールアドレス</th>
+      <td th:text="${studentDetail.student.email}">taro@example.com</td>
+    </tr>
+    <tr>
+      <th>地域</th>
+      <td th:text="${studentDetail.student.region}">東京都 千代田区</td>
+    </tr>
+    <tr>
+      <th>年齢</th>
+      <td th:text="${studentDetail.student.age}">25</td>
+    </tr>
+    <tr>
+      <th>性別</th>
+      <td th:text="${studentDetail.student.sex}">男性</td>
+    </tr>
+    <tr>
+      <th>備考</th>
+      <td th:text="${studentDetail.student.remark}">特になし</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <h3>受講コース情報</h3>
+  <table class="student-course-table">
+    <thead>
+    <tr>
+      <th>コース名</th>
+      <th>開始日</th>
+      <th>終了日</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="course : ${studentDetail.studentCourseList}">
+      <td th:text="${course.course}">Java入門</td>
+      <td th:text="${course.startDate}">2025-04-01</td>
+      <td th:text="${course.endDate}">2025-06-30</td>
+    </tr>
+    </tbody>
+  </table>
+  <section class="button-group">
+    <a th:href="@{'/student/' + ${studentDetail.student.publicId} + '/edit'}" class="action-button">変更</a>
+    <a th:href="@{'/studentList'}" class="back-button">一覧へ戻る</a>
+  </section>
+</main>
+</body>
+</html>
