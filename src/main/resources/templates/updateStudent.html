@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>受講生更新フォーム</title>
+  <link rel="stylesheet" href="/css/layout.css"/>
+  <link rel="stylesheet" href="/css/base-tables.css"/>
+  <link rel="stylesheet" href="/css/compornents.css"/>
+  <link rel="stylesheet" href="/css/update.css"/>
+</head>
+<body>
+<main class="updateStudent-container">
+  <h2>受講生更新フォーム</h2>
+
+  <form th:action="@{/updateStudent}" th:object="${studentDetail}" method="post">
+
+    <h3>受講生情報</h3>
+    <input type="hidden" th:field="*{student.publicId}"/>
+    <table class="student-table">
+      <thead>
+      <tr>
+        <th>項目</th>
+        <th>登録情報</th>
+        <th class="update-col">修正内容</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <th>名前<span class="required-label">[必須]</span></th>
+        <td th:text="*{student.fullName}">山田 太郎</td>
+        <td class="update-col"><input type="text" th:field="*{student.fullName}" class="form-input"
+                                      required/></td>
+      </tr>
+      <tr>
+        <th>カナ<span class="required-label">[必須]</span></th>
+        <td th:text="*{student.kanaName}">ヤマダ タロウ</td>
+        <td class="update-col"><input type="text" th:field="*{student.kanaName}" class="form-input"
+                                      required/></td>
+      </tr>
+      <tr>
+        <th>ニックネーム</th>
+        <td th:text="*{student.nickname}">たろちゃん</td>
+        <td class="update-col"><input type="text" th:field="*{student.nickname}"
+                                      class="form-input"/></td>
+      </tr>
+      <tr>
+        <th>メールアドレス<span class="required-label">[必須]</span></th>
+        <td th:text="*{student.email}">taro@example.com</td>
+        <td class="update-col"><input type="email" th:field="*{student.email}" class="form-input"
+                                      required/></td>
+      </tr>
+      <tr>
+        <th>地域</th>
+        <td th:text="*{student.region}">東京都 千代田区</td>
+        <td class="update-col"><input type="text" th:field="*{student.region}" class="form-input"/>
+        </td>
+      </tr>
+      <tr>
+        <th>年齢</th>
+        <td th:text="*{student.age}">25</td>
+        <td class="update-col"><input type="number" th:field="*{student.age}" min="0"
+                                      class="form-input"/></td>
+      </tr>
+      <tr>
+        <th>性別</th>
+        <td th:text="*{student.sex}">男性</td>
+        <td class="update-col">
+          <select th:field="*{student.sex}" class="form-select">
+            <option value="">選択してください</option>
+            <option value="男性">男性</option>
+            <option value="女性">女性</option>
+            <option value="その他">その他</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>備考</th>
+        <td th:text="*{student.remark}">特になし</td>
+        <td class="update-col"><textarea th:field="*{student.remark}"
+                                         class="form-textarea"></textarea></td>
+      </tr>
+      <tr>
+        <th>キャンセル</th>
+        <td th:text="*{student.deleted} ? 'キャンセル済み' : ''"></td>
+        <td class="update-col"><input type="checkbox"
+                                      th:field="*{student.deleted}"/><small>チェックを入れるとキャンセルになります</small>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h3>受講コース情報</h3>
+    <table class="student-course-table">
+      <thead>
+      <tr>
+        <th>コース名</th>
+        <th>開始日</th>
+        <th>終了日</th>
+        <th class="update-col">修正コース名<span class="required-label">[必須]</span></th>
+        <th class="update-col">修正開始日</th>
+        <th class="update-col">修正終了日</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="course, stat : *{studentCourseList}">
+        <input type="hidden" th:field="*{studentCourseList[__${stat.index}__].courseId}"/>
+        <td th:text="${course.course}">Javaコース</td>
+        <td th:text="${course.startDate}">2025-04-01</td>
+        <td th:text="${course.endDate}">2025-06-30</td>
+        <td class="update-col">
+          <select th:field="*{studentCourseList[__${stat.index}__].course}" required>
+            <option value="Javaコース">Javaコース</option>
+            <option value="AWSコース">AWSコース</option>
+            <option value="Java Scriptコース">Java Scriptコース</option>
+            <option value="AIコース">AIコース</option>
+            <option value="英会話コース">英会話コース</option>
+          </select>
+        </td>
+        <td class="update-col">
+          <input type="date" th:field="*{studentCourseList[__${stat.index}__].startDate}"/>
+        </td>
+        <td class="update-col">
+          <input type="date" th:field="*{studentCourseList[__${stat.index}__].endDate}"/>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <div class="button-group">
+      <button type="submit" class="action-button">更新</button>
+      <a th:href="@{'/student/' + ${studentDetail.student.publicId}}" class="back-button">戻る</a>
+    </div>
+  </form>
+</main>
+</body>
+</html>

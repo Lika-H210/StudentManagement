@@ -38,7 +38,10 @@
     <td th:text="${#strings.substring(studentDetail.student.publicId, 0, 8)}"
         th:title="${studentDetail.student.publicId}">a1b2c3d4
     </td>
-    <td th:text="${studentDetail.student.fullName}">山田 太郎</td>
+    <td>
+      <a th:href="@{'/student/' + ${studentDetail.student.publicId}}"
+         th:text="${studentDetail.student.fullName}">山田 太郎</a>
+    </td>
     <td th:text="${studentDetail.student.kanaName}">ヤマダ タロウ</td>
     <td th:text="${studentDetail.student.nickname}">たろちゃん</td>
     <td th:text="${studentDetail.student.email}">taro@example.com</td>
