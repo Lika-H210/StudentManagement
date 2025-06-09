@@ -67,10 +67,12 @@ public class StudentService {
   @Transactional
   public void updateStudentDetail(StudentDetail studentDetail) {
     repository.updateStudent(studentDetail.getStudent());
-    studentDetail.getStudentCourseList()
-        .forEach(studentCourse -> {
-          repository.updateStudentCourse(studentCourse);
-        });
+    if (studentDetail.getStudentCourseList() != null) {
+      studentDetail.getStudentCourseList()
+          .forEach(studentCourse -> {
+            repository.updateStudentCourse(studentCourse);
+          });
+    }
   }
 
 }
