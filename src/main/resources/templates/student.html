@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>受講生詳細情報</title>
-  <link rel="stylesheet" href="/css/layout.css"/>
-  <link rel="stylesheet" href="/css/base-tables.css"/>
-  <link rel="stylesheet" href="/css/compornents.css"/>
+  <link th:href="@{/webjars/bootstrap/5.3.6/css/bootstrap.min.css}" rel="stylesheet"/>
 </head>
 <body>
-<main class="student-container">
-  <h2>受講生詳細情報</h2>
-  <h3>受講生情報</h3>
-  <table class="student-table">
+<div class="container mt-4 mx-auto" style="max-width: 600px;">
+  <h2 class="mb-4">受講生詳細情報</h2>
+
+  <h3 class="mb-3">受講生情報</h3>
+  <table class="table table-bordered">
     <tbody>
     <tr>
       <th>ID</th>
@@ -52,9 +51,9 @@
     </tbody>
   </table>
 
-  <h3>受講コース情報</h3>
-  <table class="student-course-table">
-    <thead>
+  <h3 class="mb-3">受講コース情報</h3>
+  <table class="table table-bordered table-hover">
+    <thead class="table-light">
     <tr>
       <th>コース名</th>
       <th>開始日</th>
@@ -69,10 +68,12 @@
     </tr>
     </tbody>
   </table>
-  <section class="button-group">
-    <a th:href="@{'/student/' + ${studentDetail.student.publicId} + '/edit'}" class="action-button">変更</a>
-    <a th:href="@{'/studentList'}" class="back-button">一覧へ戻る</a>
-  </section>
-</main>
+
+  <div class="mt-4">
+    <a th:href="@{'/student/' + ${studentDetail.student.publicId} + '/edit'}"
+       class="btn btn-primary me-2">変更</a>
+    <a th:href="@{/studentList}" class="btn btn-secondary">一覧へ戻る</a>
+  </div>
+</div>
 </body>
 </html>
