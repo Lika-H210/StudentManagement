@@ -2,21 +2,22 @@ package raisetech.StudentManagement.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
 import raisetech.StudentManagement.date.Student;
 import raisetech.StudentManagement.date.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.service.StudentService;
 
-@Controller
+@RestController
 public class StudentController {
 
   private StudentService service;
@@ -29,44 +30,21 @@ public class StudentController {
   }
 
   @GetMapping("/studentList")
-  public String getStudentList(Model model) {
+  public List<StudentDetail> getStudentList() {
     List<Student> studentList = service.searchStudentList();
     List<StudentCourse> studentCourseList = service.searchStudentCourseList();
-    List<StudentDetail> studentDetailList = converter.convertToStudentDetail(studentList,
-        studentCourseList);
-    model.addAttribute("studentList", studentDetailList);
-    return "studentList";
+    return converter.convertToStudentDetail(studentList, studentCourseList);
   }
 
   @GetMapping("/student/{publicId}")
-  public String getStudentByPublicId(@PathVariable String publicId, Model model) {
-    StudentDetail studentDetail = service.searchStudentDetailByPublicId(publicId);
-    model.addAttribute("studentDetail", studentDetail);
-    return "student";
+  public StudentDetail getStudentByPublicId(@PathVariable String publicId) {
+    return service.searchStudentDetailByPublicId(publicId);
   }
 
-  @GetMapping("/student/{publicId}/edit")
-  public String editStudent(@PathVariable String publicId, Model model) {
-    StudentDetail studentDetail = service.searchStudentDetailByPublicId(publicId);
-    model.addAttribute("studentDetail", studentDetail);
-    return "updateStudent";
-  }
-
-  @PostMapping("/updateStudent")
-  public String updateStudent(@ModelAttribute StudentDetail studentDetail,
-      RedirectAttributes redirectAttributes) {
+  @PutMapping("/updateStudent")
+  public ResponseEntity<String> updateStudent(@RequestBody StudentDetail studentDetail) {
     service.updateStudentDetail(studentDetail);
-    if (studentDetail.getStudent().isDeleted()) {
-      return "redirect:/studentList";
-    }
-    redirectAttributes.addAttribute("publicId", studentDetail.getStudent().getPublicId());
-    return "redirect:/student/{publicId}";
-  }
-
-  @GetMapping("/newStudent")
-  public String displayRegisterStudent(Model model) {
-    model.addAttribute("studentDetail", new StudentDetail());
-    return "registerStudent";
+    return ResponseEntity.ok("更新処理が完了しました");
   }
 
   @PostMapping("/registerStudent")
