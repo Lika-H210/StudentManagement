@@ -56,6 +56,9 @@ public class StudentController {
   public String updateStudent(@ModelAttribute StudentDetail studentDetail,
       RedirectAttributes redirectAttributes) {
     service.updateStudentDetail(studentDetail);
+    if (studentDetail.getStudent().isDeleted()) {
+      return "redirect:/studentList";
+    }
     redirectAttributes.addAttribute("publicId", studentDetail.getStudent().getPublicId());
     return "redirect:/student/{publicId}";
   }
