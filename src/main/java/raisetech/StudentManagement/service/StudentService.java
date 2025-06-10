@@ -37,7 +37,7 @@ public class StudentService {
   }
 
   @Transactional
-  public void registerStudentDetail(StudentDetail studentDetail) {
+  public StudentDetail registerStudentDetail(StudentDetail studentDetail) {
     //受講生の登録
     //Todo:emailの重複チェック（例外処理作成後に実装）
     UUID uuid = UUID.randomUUID();
@@ -50,6 +50,7 @@ public class StudentService {
         && !studentDetail.getStudentCourseList().isEmpty()) {
       registerStudentCourse(studentId, studentDetail.getStudentCourseList().getFirst());
     }
+    return studentDetail;
   }
 
   @Transactional

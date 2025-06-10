@@ -32,6 +32,7 @@ public interface StudentRepository {
 
   @Insert("INSERT INTO students_courses (student_id, course, start_date, end_date)"
       + "VALUES (#{studentId}, #{course}, #{startDate}, #{endDate})")
+  @Options(useGeneratedKeys = true, keyProperty = "courseId")
   void registerStudentCourse(StudentCourse studentcourse);
 
   @Update("UPDATE students "
