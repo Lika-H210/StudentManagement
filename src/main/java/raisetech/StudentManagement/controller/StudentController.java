@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import raisetech.StudentManagement.controller.converter.StudentConverter;
-import raisetech.StudentManagement.date.Student;
-import raisetech.StudentManagement.date.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.service.StudentService;
 
@@ -19,19 +16,15 @@ import raisetech.StudentManagement.service.StudentService;
 public class StudentController {
 
   private StudentService service;
-  private StudentConverter converter;
 
   @Autowired
-  public StudentController(StudentService service, StudentConverter converter) {
+  public StudentController(StudentService service) {
     this.service = service;
-    this.converter = converter;
   }
 
   @GetMapping("/studentList")
   public List<StudentDetail> getStudentList() {
-    List<Student> studentList = service.searchStudentList();
-    List<StudentCourse> studentCourseList = service.searchStudentCourseList();
-    return converter.convertToStudentDetail(studentList, studentCourseList);
+    return service.searchStudentDetailList();
   }
 
   @GetMapping("/student/{publicId}")
@@ -39,16 +32,16 @@ public class StudentController {
     return service.searchStudentDetailByPublicId(publicId);
   }
 
-  @PutMapping("/updateStudent")
-  public ResponseEntity<String> updateStudent(@RequestBody StudentDetail studentDetail) {
-    service.updateStudentDetail(studentDetail);
-    return ResponseEntity.ok("更新処理が完了しました");
-  }
-
   @PostMapping("/registerStudent")
   public ResponseEntity<StudentDetail> registerStudent(@RequestBody StudentDetail studentDetail) {
     StudentDetail registerStudentDetail = service.registerStudentDetail(studentDetail);
     return ResponseEntity.ok(registerStudentDetail);
+  }
+
+  @PutMapping("/updateStudent")
+  public ResponseEntity<String> updateStudent(@RequestBody StudentDetail studentDetail) {
+    service.updateStudentDetail(studentDetail);
+    return ResponseEntity.ok("更新処理が完了しました");
   }
 
 }

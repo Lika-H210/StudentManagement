@@ -10,23 +10,24 @@ import raisetech.StudentManagement.date.Student;
 import raisetech.StudentManagement.date.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.repository.StudentRepository;
+import raisetech.StudentManagement.service.converter.StudentConverter;
 
 @Service
 public class StudentService {
 
   private StudentRepository repository;
+  private StudentConverter converter;
 
   @Autowired
-  public StudentService(StudentRepository repository) {
+  public StudentService(StudentRepository repository, StudentConverter converter) {
     this.repository = repository;
+    this.converter = converter;
   }
 
-  public List<Student> searchStudentList() {
-    return repository.searchStudentList();
-  }
-
-  public List<StudentCourse> searchStudentCourseList() {
-    return repository.searchStudentCourseList();
+  public List<StudentDetail> searchStudentDetailList() {
+    List<Student> studentList = repository.searchStudentList();
+    List<StudentCourse> searchStudentsCourseList = repository.searchStudentCourseList();
+    return converter.convertToStudentDetail(studentList, searchStudentsCourseList);
   }
 
   public StudentDetail searchStudentDetailByPublicId(String publicId) {
@@ -40,8 +41,7 @@ public class StudentService {
   public StudentDetail registerStudentDetail(StudentDetail studentDetail) {
     //受講生の登録
     //Todo:emailの重複チェック（例外処理作成後に実装）
-    UUID uuid = UUID.randomUUID();
-    studentDetail.getStudent().setPublicId(uuid.toString());
+    studentDetail.getStudent().setPublicId(UUID.randomUUID().toString());
     repository.registerStudent(studentDetail.getStudent());
 
     //コース情報の登録
@@ -55,13 +55,17 @@ public class StudentService {
 
   @Transactional
   public void registerStudentCourse(Integer studentId, StudentCourse studentCourse) {
+    initializeStudentCourse(studentId, studentCourse);
+    if (studentCourse.getCourse() != null && !studentCourse.getCourse().isEmpty()) {
+      repository.registerStudentCourse(studentCourse);
+    }
+  }
+
+  private void initializeStudentCourse(Integer studentId, StudentCourse studentCourse) {
     studentCourse.setStudentId(studentId);
     LocalDate startDate = studentCourse.getStartDate();
     if (startDate != null) {
       studentCourse.setEndDate(startDate.plusMonths(6));
-    }
-    if (studentCourse.getCourse() != null && !studentCourse.getCourse().isEmpty()) {
-      repository.registerStudentCourse(studentCourse);
     }
   }
 

@@ -1,4 +1,4 @@
-package raisetech.StudentManagement.controller.converter;
+package raisetech.StudentManagement.service.converter;
 
 import java.util.List;
 import org.springframework.stereotype.Component;
