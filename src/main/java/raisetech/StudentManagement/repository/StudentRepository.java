@@ -9,38 +9,83 @@ import org.apache.ibatis.annotations.Update;
 import raisetech.StudentManagement.date.Student;
 import raisetech.StudentManagement.date.StudentCourse;
 
+/**
+ * 受講生情報および受講コース情報に関するDBアクセス処理を定義するリポジトリインターフェースです。 対象テーブル：students、students_courses
+ */
 @Mapper
 public interface StudentRepository {
 
+  /**
+   * 全受講生の情報を取得します。(但し、キャンセル扱い(isDeleted=true)の受講生は除きます）
+   *
+   * @return 受講生情報（Student）のリスト
+   */
   @Select("SELECT * FROM students WHERE is_deleted = false")
   List<Student> searchStudentList();
 
+  /**
+   * 全受講生の全受講コース情報を取得します。
+   *
+   * @return 受講コース情報（StudentCourse）のリスト
+   */
   @Select("SELECT * FROM students_courses")
   List<StudentCourse> searchStudentCourseList();
 
+  /**
+   * publicIdに対応した受講生情報を取得します。
+   *
+   * @param publicId 受講生の Public ID（UUID）
+   * @return 対象の受講生情報（Student）
+   */
   @Select("SELECT * FROM students WHERE public_id = #{publicId}")
   Student searchStudentByPublicId(String publicId);
 
+  /**
+   * 指定された受講生IDに関連するすべての受講コース情報を取得します。
+   *
+   * @param studentId 受講生ID
+   * @return 対象受講生の受講コース情報（StudentCourse）のリスト
+   */
   @Select("SELECT * FROM students_courses WHERE student_id = #{studentId}")
   List<StudentCourse> searchStudentCourseListByStudentId(Integer studentId);
 
+  /**
+   * 受講生情報を新規登録します。主キー（studentId）は自動生成され、登録後にオブジェクトにセットされます。
+   *
+   * @param student 登録する受講生情報
+   */
   @Insert(
       "INSERT INTO students (public_id, full_name, kana_name, nickname, email, region, age, sex, remark, is_deleted)"
           + "VALUES (#{publicId}, #{fullName}, #{kanaName}, #{nickname}, #{email}, #{region}, #{age}, #{sex}, #{remark}, #{isDeleted})")
   @Options(useGeneratedKeys = true, keyProperty = "studentId")
   void registerStudent(Student student);
 
+  /**
+   * 受講コース情報を新規登録します。主キー（courseId）は自動生成され、登録後にオブジェクトにセットされます。
+   *
+   * @param studentCourse 登録する受講コース情報
+   */
   @Insert("INSERT INTO students_courses (student_id, course, start_date, end_date)"
       + "VALUES (#{studentId}, #{course}, #{startDate}, #{endDate})")
   @Options(useGeneratedKeys = true, keyProperty = "courseId")
   void registerStudentCourse(StudentCourse studentCourse);
 
+  /**
+   * publicIdに対応した受講生情報を更新します。
+   *
+   * @param student 更新対象の受講生情報
+   */
   @Update("UPDATE students "
       + "SET full_name = #{fullName}, kana_name = #{kanaName}, nickname = #{nickname}, email = #{email}, "
       + "region = #{region}, age = #{age}, sex = #{sex}, remark = #{remark}, is_deleted = #{isDeleted} "
       + "WHERE public_id = #{publicId}")
   void updateStudent(Student student);
 
+  /**
+   * courseIdに対応した受講コース情報を更新します。
+   *
+   * @param studentCourse 更新対象の受講コース情報
+   */
   @Update("UPDATE students_courses "
       + "SET course = #{course}, start_date = #{startDate}, end_date = #{endDate} "
       + "WHERE course_id = #{courseId}")
