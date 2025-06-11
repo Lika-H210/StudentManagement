@@ -68,7 +68,7 @@ public class StudentService {
     Integer studentId = studentDetail.getStudent().getStudentId();
     if (studentDetail.getStudentCourseList() != null
         && !studentDetail.getStudentCourseList().isEmpty()) {
-      registerStudentCourse(studentId, studentDetail.getStudentCourseList().getFirst());
+      registerStudentCourse(studentId, studentDetail.getStudentCourseList());
     }
     return studentDetail;
   }
@@ -76,15 +76,18 @@ public class StudentService {
   /**
    * 指定された受講生IDに紐づく受講コースを登録します。初期値は必要に応じ設定されます。
    *
-   * @param studentId     対象の受講生の受講生のID
-   * @param studentCourse 登録するコース情報
+   * @param studentId         対象の受講生の受講生のID
+   * @param studentCourseList 登録するコース情報
    */
   @Transactional
-  public void registerStudentCourse(Integer studentId, StudentCourse studentCourse) {
-    initializeStudentCourse(studentId, studentCourse);
-    if (studentCourse.getCourse() != null && !studentCourse.getCourse().isEmpty()) {
-      repository.registerStudentCourse(studentCourse);
-    }
+  public void registerStudentCourse(Integer studentId, List<StudentCourse> studentCourseList) {
+    studentCourseList.stream()
+        .filter(studentCourse -> studentCourse.getCourse() != null && !studentCourse.getCourse()
+            .isEmpty())
+        .forEach(studentCourse -> {
+          initializeStudentCourse(studentId, studentCourse);
+          repository.registerStudentCourse(studentCourse);
+        });
   }
 
   /**
