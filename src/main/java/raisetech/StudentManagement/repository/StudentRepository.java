@@ -1,11 +1,7 @@
 package raisetech.StudentManagement.repository;
 
 import java.util.List;
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 
@@ -20,7 +16,6 @@ public interface StudentRepository {
    *
    * @return 受講生情報（Student）のリスト
    */
-  @Select("SELECT * FROM students WHERE is_deleted = false")
   List<Student> searchStudentList();
 
   /**
@@ -28,7 +23,6 @@ public interface StudentRepository {
    *
    * @return 受講コース情報（StudentCourse）のリスト
    */
-  @Select("SELECT * FROM students_courses")
   List<StudentCourse> searchStudentCourseList();
 
   /**
@@ -37,7 +31,6 @@ public interface StudentRepository {
    * @param publicId 受講生の Public ID（UUID）
    * @return 対象の受講生情報（Student）
    */
-  @Select("SELECT * FROM students WHERE public_id = #{publicId}")
   Student searchStudentByPublicId(String publicId);
 
   /**
@@ -46,7 +39,6 @@ public interface StudentRepository {
    * @param studentId 受講生ID
    * @return 対象受講生の受講コース情報（StudentCourse）のリスト
    */
-  @Select("SELECT * FROM students_courses WHERE student_id = #{studentId}")
   List<StudentCourse> searchStudentCourseListByStudentId(Integer studentId);
 
   /**
@@ -54,10 +46,6 @@ public interface StudentRepository {
    *
    * @param student 登録する受講生情報
    */
-  @Insert(
-      "INSERT INTO students (public_id, full_name, kana_name, nickname, email, region, age, sex, remark, is_deleted)"
-          + "VALUES (#{publicId}, #{fullName}, #{kanaName}, #{nickname}, #{email}, #{region}, #{age}, #{sex}, #{remark}, #{isDeleted})")
-  @Options(useGeneratedKeys = true, keyProperty = "studentId")
   void registerStudent(Student student);
 
   /**
@@ -65,9 +53,6 @@ public interface StudentRepository {
    *
    * @param studentCourse 登録する受講コース情報
    */
-  @Insert("INSERT INTO students_courses (student_id, course, start_date, end_date)"
-      + "VALUES (#{studentId}, #{course}, #{startDate}, #{endDate})")
-  @Options(useGeneratedKeys = true, keyProperty = "courseId")
   void registerStudentCourse(StudentCourse studentCourse);
 
   /**
@@ -75,10 +60,6 @@ public interface StudentRepository {
    *
    * @param student 更新対象の受講生情報
    */
-  @Update("UPDATE students "
-      + "SET full_name = #{fullName}, kana_name = #{kanaName}, nickname = #{nickname}, email = #{email}, "
-      + "region = #{region}, age = #{age}, sex = #{sex}, remark = #{remark}, is_deleted = #{isDeleted} "
-      + "WHERE public_id = #{publicId}")
   void updateStudent(Student student);
 
   /**
@@ -86,9 +67,6 @@ public interface StudentRepository {
    *
    * @param studentCourse 更新対象の受講コース情報
    */
-  @Update("UPDATE students_courses "
-      + "SET course = #{course}, start_date = #{startDate}, end_date = #{endDate} "
-      + "WHERE course_id = #{courseId}")
   void updateStudentCourse(StudentCourse studentCourse);
 
 }
