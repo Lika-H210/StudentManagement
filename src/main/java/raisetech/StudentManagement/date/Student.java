@@ -3,6 +3,9 @@ package raisetech.StudentManagement.date;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 受講生情報を表すエンティティクラスです。 DBのstudentsテーブルに対応します。
+ */
 @Getter
 @Setter
 public class Student {

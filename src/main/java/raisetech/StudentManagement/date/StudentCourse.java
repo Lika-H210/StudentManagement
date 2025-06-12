@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+/**
+ * 受講コース情報を表すエンティティクラスです。DBのstudents_courseテーブルに対応します。
+ */
 @Getter
 @Setter
 public class StudentCourse {
