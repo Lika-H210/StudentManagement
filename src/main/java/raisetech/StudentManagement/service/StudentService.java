@@ -45,6 +45,7 @@ public class StudentService {
    * @return 該当する受講生の詳細情報
    */
   public StudentDetail searchStudentDetailByPublicId(String publicId) {
+    //Todo:Idの対象生徒がいない場合404or空StudentDetailを返す
     Student student = repository.searchStudentByPublicId(publicId);
     List<StudentCourse> studentCourseList = repository.searchStudentCourseListByStudentId(
         student.getStudentId());
