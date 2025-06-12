@@ -6,8 +6,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import raisetech.StudentManagement.date.Student;
-import raisetech.StudentManagement.date.StudentCourse;
+import raisetech.StudentManagement.data.Student;
+import raisetech.StudentManagement.data.StudentCourse;
 
 /**
  * 受講生情報および受講コース情報に関するDBアクセス処理を定義するリポジトリインターフェースです。 対象テーブル：students、students_courses

@@ -2,8 +2,8 @@ package raisetech.StudentManagement.service.converter;
 
 import java.util.List;
 import org.springframework.stereotype.Component;
-import raisetech.StudentManagement.date.Student;
-import raisetech.StudentManagement.date.StudentCourse;
+import raisetech.StudentManagement.data.Student;
+import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
 
 /**
