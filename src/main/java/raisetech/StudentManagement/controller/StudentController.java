@@ -1,8 +1,10 @@
 package raisetech.StudentManagement.controller;
 
+import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.service.StudentService;
+import raisetech.StudentManagement.validation.RegisterGroup;
+import raisetech.StudentManagement.validation.UpdateGroup;
 
 
 /**
@@ -19,6 +23,7 @@ import raisetech.StudentManagement.service.StudentService;
  * このクラスでは受講生情報（StudentDetail）に関する取得・登録・更新の処理を提供します。
  */
 @RestController
+@Validated
 public class StudentController {
 
   private StudentService service;
@@ -46,7 +51,11 @@ public class StudentController {
    * @return 該当する受講生の詳細情報
    */
   @GetMapping("/student/{publicId}")
-  public StudentDetail getStudentByPublicId(@PathVariable String publicId) {
+  public StudentDetail getStudentByPublicId(
+      @PathVariable
+      @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          message = "入力の形式に誤りがあります")
+      String publicId) {
     return service.searchStudentDetailByPublicId(publicId);
   }
 
@@ -57,7 +66,9 @@ public class StudentController {
    * @return 登録された受講生の詳細情報
    */
   @PostMapping("/registerStudent")
-  public ResponseEntity<StudentDetail> registerStudent(@RequestBody StudentDetail studentDetail) {
+  public ResponseEntity<StudentDetail> registerStudent(
+      @Validated(RegisterGroup.class)
+      @RequestBody StudentDetail studentDetail) {
     StudentDetail registerStudentDetail = service.registerStudentDetail(studentDetail);
     return ResponseEntity.ok(registerStudentDetail);
   }
@@ -69,7 +80,9 @@ public class StudentController {
    * @return 更新結果のメッセージ（成功時）
    */
   @PutMapping("/updateStudent")
-  public ResponseEntity<String> updateStudent(@RequestBody StudentDetail studentDetail) {
+  public ResponseEntity<String> updateStudent(
+      @Validated(UpdateGroup.class)
+      @RequestBody StudentDetail studentDetail) {
     service.updateStudentDetail(studentDetail);
     return ResponseEntity.ok("更新処理が完了しました");
   }
