@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import raisetech.StudentManagement.exception.converter.ErrorResponseConverter;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
+import raisetech.StudentManagement.exception.custom.ResourceNotFoundException;
 import raisetech.StudentManagement.exception.custom.TestException;
 import raisetech.StudentManagement.exception.response.ErrorResponse;
 
@@ -68,6 +69,19 @@ public class ApiExceptionHandler {
 
     //表示内容
     HttpStatus status = HttpStatus.CONFLICT;
+    ErrorResponse errorResponse = new ErrorResponse(status, ex.getMessage());
+
+    return ResponseEntity.status(status).body(errorResponse);
+  }
+
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
+      ResourceNotFoundException ex) {
+    // 開発者向けログ出力
+    log.warn("Resource not found: {}", ex.getMessage(), ex);
+
+    //表示内容
+    HttpStatus status = HttpStatus.NOT_FOUND;
     ErrorResponse errorResponse = new ErrorResponse(status, ex.getMessage());
 
     return ResponseEntity.status(status).body(errorResponse);

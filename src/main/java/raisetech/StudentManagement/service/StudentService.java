@@ -10,6 +10,7 @@ import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
+import raisetech.StudentManagement.exception.custom.ResourceNotFoundException;
 import raisetech.StudentManagement.repository.StudentRepository;
 import raisetech.StudentManagement.service.converter.StudentConverter;
 
@@ -46,10 +47,15 @@ public class StudentService {
    * @return 該当する受講生の詳細情報
    */
   public StudentDetail searchStudentDetailByPublicId(String publicId) {
-    //Todo:Idの対象生徒がいない場合404or空StudentDetailを返す
+
     Student student = repository.searchStudentByPublicId(publicId);
+    if (student == null) {
+      throw new ResourceNotFoundException("検索対象の受講生情報は見つかりませんでした");
+    }
+
     List<StudentCourse> studentCourseList = repository.searchStudentCourseListByStudentId(
         student.getStudentId());
+
     return new StudentDetail(student, studentCourseList);
   }
 
