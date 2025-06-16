@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.domain.StudentDetail;
-import raisetech.StudentManagement.exception.TestException;
+import raisetech.StudentManagement.exception.custom.TestException;
 import raisetech.StudentManagement.service.StudentService;
 import raisetech.StudentManagement.validation.RegisterGroup;
 import raisetech.StudentManagement.validation.UpdateGroup;
