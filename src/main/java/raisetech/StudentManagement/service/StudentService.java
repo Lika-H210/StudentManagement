@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.exception.custom.NotUniqueException;
 import raisetech.StudentManagement.repository.StudentRepository;
 import raisetech.StudentManagement.service.converter.StudentConverter;
 
@@ -60,8 +61,12 @@ public class StudentService {
    */
   @Transactional
   public StudentDetail registerStudentDetail(StudentDetail studentDetail) {
+    //登録前チェック
+    if (repository.existsByEmail(studentDetail.getStudent().getEmail())) {
+      throw new NotUniqueException("このメールアドレスは既に登録されています");
+    }
+
     //受講生の登録
-    //Todo:emailの重複チェック（例外処理作成後に実装）
     studentDetail.getStudent().setPublicId(UUID.randomUUID().toString());
     repository.registerStudent(studentDetail.getStudent());
 

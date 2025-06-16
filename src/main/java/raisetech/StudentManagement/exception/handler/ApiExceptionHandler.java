@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import raisetech.StudentManagement.exception.converter.ErrorResponseConverter;
+import raisetech.StudentManagement.exception.custom.NotUniqueException;
 import raisetech.StudentManagement.exception.custom.TestException;
 import raisetech.StudentManagement.exception.response.ErrorResponse;
 
@@ -58,6 +59,18 @@ public class ApiExceptionHandler {
     ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, fieldErrors);
 
     return ResponseEntity.badRequest().body(errorResponse);
+  }
+
+  @ExceptionHandler(NotUniqueException.class)
+  public ResponseEntity<ErrorResponse> handleNotUniqueException(NotUniqueException ex) {
+    // 開発者向けログ出力
+    log.warn("Duplicate value error: {}", ex.getMessage(), ex);
+
+    //表示内容
+    HttpStatus status = HttpStatus.CONFLICT;
+    ErrorResponse errorResponse = new ErrorResponse(status, ex.getMessage());
+
+    return ResponseEntity.status(status).body(errorResponse);
   }
 
   @ExceptionHandler(TestException.class)

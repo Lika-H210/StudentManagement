@@ -73,4 +73,11 @@
     end_date = #{endDate}
     WHERE course_id = #{courseId}
   </update>
+
+  <!-- Emailの重複確認 -->
+  <select id="existsByEmail" parameterType="string">
+    SELECT COUNT(*) > 0
+    FROM students
+    WHERE email = #{email}
+  </select>
 </mapper>
