@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.exception.custom.IllegalResourceAccessException;
+import raisetech.StudentManagement.exception.custom.NotUniqueException;
 import raisetech.StudentManagement.repository.StudentRepository;
 import raisetech.StudentManagement.service.converter.StudentConverter;
 
@@ -45,10 +47,16 @@ public class StudentService {
    * @return 該当する受講生の詳細情報
    */
   public StudentDetail searchStudentDetailByPublicId(String publicId) {
-    //Todo:Idの対象生徒がいない場合404or空StudentDetailを返す
+
     Student student = repository.searchStudentByPublicId(publicId);
+    if (student == null) {
+      throw new IllegalResourceAccessException(
+          "受講生情報の取得中に問題が発生しました。システム管理者までご連絡ください。");
+    }
+
     List<StudentCourse> studentCourseList = repository.searchStudentCourseListByStudentId(
         student.getStudentId());
+
     return new StudentDetail(student, studentCourseList);
   }
 
@@ -59,9 +67,14 @@ public class StudentService {
    * @return 登録された受講生詳細情報
    */
   @Transactional
-  public StudentDetail registerStudentDetail(StudentDetail studentDetail) {
+  public StudentDetail registerStudentDetail(StudentDetail studentDetail)
+      throws NotUniqueException {
+    //登録前チェック
+    if (repository.existsByEmail(studentDetail.getStudent().getEmail())) {
+      throw new NotUniqueException("このメールアドレスは既に登録されています");
+    }
+
     //受講生の登録
-    //Todo:emailの重複チェック（例外処理作成後に実装）
     studentDetail.getStudent().setPublicId(UUID.randomUUID().toString());
     repository.registerStudent(studentDetail.getStudent());
 

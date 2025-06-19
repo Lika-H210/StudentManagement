@@ -69,4 +69,11 @@ public interface StudentRepository {
    */
   void updateStudentCourse(StudentCourse studentCourse);
 
+  /**
+   * 指定されたメールアドレスが既に登録されているかを確認します。
+   *
+   * @param email 受講生のメールアドレス
+   * @return true 登録済みの場合、false 未登録の場合
+   */
+  boolean existsByEmail(String email);
 }
