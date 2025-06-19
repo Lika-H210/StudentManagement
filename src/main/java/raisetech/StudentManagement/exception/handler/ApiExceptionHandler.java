@@ -10,8 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import raisetech.StudentManagement.exception.converter.ErrorResponseConverter;
+import raisetech.StudentManagement.exception.custom.IllegalResourceAccessException;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
-import raisetech.StudentManagement.exception.custom.ResourceNotFoundException;
 import raisetech.StudentManagement.exception.custom.TestException;
 import raisetech.StudentManagement.exception.response.ErrorResponse;
 
@@ -74,11 +74,12 @@ public class ApiExceptionHandler {
     return ResponseEntity.status(status).body(errorResponse);
   }
 
-  @ExceptionHandler(ResourceNotFoundException.class)
+  @ExceptionHandler(IllegalResourceAccessException.class)
   public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
-      ResourceNotFoundException ex) {
+      IllegalResourceAccessException ex) {
     // 開発者向けログ出力
-    log.warn("Resource not found: {}", ex.getMessage(), ex);
+    log.error("Attempted to access a resource that should exist but was not found: {}",
+        ex.getMessage(), ex);
 
     //表示内容
     HttpStatus status = HttpStatus.NOT_FOUND;
@@ -86,6 +87,9 @@ public class ApiExceptionHandler {
 
     return ResponseEntity.status(status).body(errorResponse);
   }
+
+  //Todo:Exception.classの想定外に発生した例外を一括対応する@ExceptionHandlerの実装
+  //Todo:RuntimeException.classの想定外に発生した例外を一括対応する@ExceptionHandlerの実装
 
   @ExceptionHandler(TestException.class)
   public ResponseEntity<String> exceptionHandler(TestException ex) {

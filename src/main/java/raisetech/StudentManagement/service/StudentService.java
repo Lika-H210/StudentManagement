@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.exception.custom.IllegalResourceAccessException;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
-import raisetech.StudentManagement.exception.custom.ResourceNotFoundException;
 import raisetech.StudentManagement.repository.StudentRepository;
 import raisetech.StudentManagement.service.converter.StudentConverter;
 
@@ -50,7 +50,8 @@ public class StudentService {
 
     Student student = repository.searchStudentByPublicId(publicId);
     if (student == null) {
-      throw new ResourceNotFoundException("検索対象の受講生情報は見つかりませんでした");
+      throw new IllegalResourceAccessException(
+          "受講生情報の取得中に問題が発生しました。システム管理者までご連絡ください。");
     }
 
     List<StudentCourse> studentCourseList = repository.searchStudentCourseListByStudentId(
@@ -66,7 +67,8 @@ public class StudentService {
    * @return 登録された受講生詳細情報
    */
   @Transactional
-  public StudentDetail registerStudentDetail(StudentDetail studentDetail) {
+  public StudentDetail registerStudentDetail(StudentDetail studentDetail)
+      throws NotUniqueException {
     //登録前チェック
     if (repository.existsByEmail(studentDetail.getStudent().getEmail())) {
       throw new NotUniqueException("このメールアドレスは既に登録されています");

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.exception.custom.NotUniqueException;
 import raisetech.StudentManagement.exception.custom.TestException;
 import raisetech.StudentManagement.service.StudentService;
 import raisetech.StudentManagement.validation.RegisterGroup;
@@ -69,7 +70,7 @@ public class StudentController {
   @PostMapping("/registerStudent")
   public ResponseEntity<StudentDetail> registerStudent(
       @Validated(RegisterGroup.class)
-      @RequestBody StudentDetail studentDetail) {
+      @RequestBody StudentDetail studentDetail) throws NotUniqueException {
     StudentDetail registerStudentDetail = service.registerStudentDetail(studentDetail);
     return ResponseEntity.ok(registerStudentDetail);
   }
