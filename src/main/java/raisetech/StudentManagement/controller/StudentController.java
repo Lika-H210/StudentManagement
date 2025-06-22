@@ -1,5 +1,11 @@
 package raisetech.StudentManagement.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
+import raisetech.StudentManagement.exception.response.CustomErrorResponse;
 import raisetech.StudentManagement.service.StudentService;
 import raisetech.StudentManagement.validation.RegisterGroup;
 import raisetech.StudentManagement.validation.UpdateGroup;
+import raisetech.StudentManagement.view.RequestViews;
 
 
 /**
@@ -40,6 +48,24 @@ public class StudentController {
    *
    * @return 受講生詳細情報のリスト
    */
+  @Operation(summary = "受講生詳細一覧を取得", description = "受講生詳細情報の一覧を取得します。（但し、キャンセル扱いの受講生は除きます。）")
+  @ApiResponse(
+      responseCode = "200",
+      description = "リクエストが正常に処理された場合",
+      content = @Content(
+          mediaType = "application/json",
+          array = @ArraySchema(schema = @Schema(implementation = StudentDetail.class)
+          )
+      )
+  )
+  @ApiResponse(
+      responseCode = "500",
+      description = "サーバー内部で予期しないエラーが発生した場合（※実際のレスポンス形式とは異なる可能性があります）",
+      content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = CustomErrorResponse.class)
+      )
+  )
   @GetMapping("/studentList")
   public List<StudentDetail> getStudentList() {
     return service.searchStudentDetailList();
@@ -51,6 +77,39 @@ public class StudentController {
    * @param publicId 受講生の公開ID（UUID形式）
    * @return 該当する受講生の詳細情報
    */
+  @Operation(summary = "個人の受講生詳細を取得", description = "指定されたpublicIdと紐づく受講生の詳細情報を取得します。")
+  @ApiResponse(
+      responseCode = "200",
+      description = "リクエストが正常に処理された場合",
+      content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = StudentDetail.class)
+      )
+  )
+  @ApiResponse(
+      responseCode = "400",
+      description = "登録内容がバリデーション条件を満たさない場合(※ExampleValueは実際のレスポンス項目・内容と異なる可能性があります。)",
+      content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = CustomErrorResponse.class)
+      )
+  )
+  @ApiResponse(
+      responseCode = "404",
+      description = "対象IDの受講生が見つからなかった場合(※ExampleValueは実際のレスポンス項目・内容と異なる可能性があります。)",
+      content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = CustomErrorResponse.class)
+      )
+  )
+  @ApiResponse(
+      responseCode = "500",
+      description = "サーバー内部で予期しないエラーが発生した場合（※実際のレスポンス形式とは異なる可能性があります）",
+      content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = CustomErrorResponse.class)
+      )
+  )
   @GetMapping("/student/{publicId}")
   public StudentDetail getStudentByPublicId(
       @PathVariable
@@ -66,9 +125,43 @@ public class StudentController {
    * @param studentDetail 登録する受講生の詳細情報
    * @return 登録された受講生の詳細情報
    */
+  @Operation(summary = "受講生登録処理", description = "受講生の登録と受講コースの登録を行います。(受講コース登録は任意)")
+  @ApiResponse(
+      responseCode = "201",
+      description = "正常に新規登録が完了した場合",
+      content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = StudentDetail.class)
+      )
+  )
+  @ApiResponse(
+      responseCode = "400",
+      description = "リクエストパラメータがバリデーションルールに適合しない場合(※ExampleValueは実際のレスポンス項目・内容と異なる可能性があります。)",
+      content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = CustomErrorResponse.class)
+      )
+  )
+  @ApiResponse(
+      responseCode = "409",
+      description = "Emailの登録内容と同じEmailが既に登録済みの場合(※ExampleValueは実際のレスポンス項目・内容と異なる可能性があります。)",
+      content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = CustomErrorResponse.class)
+      )
+  )
+  @ApiResponse(
+      responseCode = "500",
+      description = "サーバー内部で予期しないエラーが発生した場合（※実際のレスポンス形式とは異なる可能性があります）",
+      content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = CustomErrorResponse.class)
+      )
+  )
   @PostMapping("/registerStudent")
   public ResponseEntity<StudentDetail> registerStudentDetail(
       @Validated(RegisterGroup.class)
+      @JsonView(RequestViews.Register.class)
       @RequestBody StudentDetail studentDetail) throws NotUniqueException {
     StudentDetail registerStudentDetail = service.registerStudentDetail(studentDetail);
     return ResponseEntity.ok(registerStudentDetail);
@@ -80,9 +173,43 @@ public class StudentController {
    * @param studentDetail 更新する受講生の詳細情報
    * @return 更新結果のメッセージ（成功時）
    */
+  @Operation(summary = "受講生更新処理", description = "受講生とそれに紐づく受講コースの更新を行います。")
+  @ApiResponse(
+      responseCode = "200",
+      description = "リクエストが正常に処理された場合",
+      content = @Content(
+          mediaType = "text/plain",
+          schema = @Schema(implementation = String.class)
+      )
+  )
+  @ApiResponse(
+      responseCode = "400",
+      description = "リクエストパラメータがバリデーションルールに適合しない場合(※ExampleValueは実際のレスポンス項目・内容と異なる可能性があります。)",
+      content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = CustomErrorResponse.class)
+      )
+  )
+  @ApiResponse(
+      responseCode = "409",
+      description = "Emailの登録内容と同じEmailが既に登録済みの場合(※ExampleValueは実際のレスポンス項目・内容と異なる可能性があります。)",
+      content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = CustomErrorResponse.class)
+      )
+  )
+  @ApiResponse(
+      responseCode = "500",
+      description = "サーバー内部で予期しないエラーが発生した場合（※実際のレスポンス形式とは異なる可能性があります）",
+      content = @Content(
+          mediaType = "application/json",
+          schema = @Schema(implementation = CustomErrorResponse.class)
+      )
+  )
   @PutMapping("/updateStudent")
   public ResponseEntity<String> updateStudentDetail(
       @Validated(UpdateGroup.class)
+      @JsonView(RequestViews.Update.class)
       @RequestBody StudentDetail studentDetail) throws NotUniqueException {
     service.updateStudentDetail(studentDetail);
     return ResponseEntity.ok("更新処理が完了しました");
