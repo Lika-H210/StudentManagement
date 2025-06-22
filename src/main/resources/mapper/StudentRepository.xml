@@ -74,10 +74,19 @@
     WHERE course_id = #{courseId}
   </update>
 
-  <!-- Emailの重複確認 -->
-  <select id="existsByEmail" parameterType="string">
+  <!-- Emailの重複確認 登録時-->
+  <select id="existsByEmail" resultType="boolean" parameterType="string">
     SELECT COUNT(*) > 0
     FROM students
     WHERE email = #{email}
   </select>
+
+  <!-- Emailの重複確認 更新時-->
+  <select id="existsByEmailExcludingPublicId" parameterType="map" resultType="boolean">
+    SELECT COUNT(*) > 0
+    FROM students
+    WHERE email = #{email}
+    AND public_id != #{publicId}
+  </select>
+
 </mapper>

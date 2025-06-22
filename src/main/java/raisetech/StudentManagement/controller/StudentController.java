@@ -84,7 +84,7 @@ public class StudentController {
   @PutMapping("/updateStudent")
   public ResponseEntity<String> updateStudent(
       @Validated(UpdateGroup.class)
-      @RequestBody StudentDetail studentDetail) {
+      @RequestBody StudentDetail studentDetail) throws NotUniqueException {
     service.updateStudentDetail(studentDetail);
     return ResponseEntity.ok("更新処理が完了しました");
   }

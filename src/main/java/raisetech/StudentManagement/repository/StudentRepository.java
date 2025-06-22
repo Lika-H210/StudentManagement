@@ -2,6 +2,7 @@ package raisetech.StudentManagement.repository;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 
@@ -76,4 +77,14 @@ public interface StudentRepository {
    * @return true 登録済みの場合、false 未登録の場合
    */
   boolean existsByEmail(String email);
+
+  /**
+   * 指定されたメールアドレスが既に登録されているかを確認します。
+   *
+   * @param publicId 公開用ID
+   * @param email    受講生のメールアドレス
+   * @return true 登録済みの場合、false 未登録の場合
+   */
+  boolean existsByEmailExcludingPublicId(@Param("publicId") String publicId,
+      @Param("email") String email);
 }

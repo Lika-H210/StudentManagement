@@ -124,7 +124,13 @@ public class StudentService {
    * @param studentDetail 更新対象の受講生詳細情報
    */
   @Transactional
-  public void updateStudentDetail(StudentDetail studentDetail) {
+  public void updateStudentDetail(StudentDetail studentDetail) throws NotUniqueException {
+    //更新前チェック
+    Student student = studentDetail.getStudent();
+    if (repository.existsByEmailExcludingPublicId(student.getPublicId(), student.getEmail())) {
+      throw new NotUniqueException("このメールアドレスは使用できません。");
+    }
+
     repository.updateStudent(studentDetail.getStudent());
     if (studentDetail.getStudentCourseList() != null) {
       studentDetail.getStudentCourseList()
