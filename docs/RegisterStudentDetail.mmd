@@ -1,0 +1,33 @@
+sequenceDiagram
+    participant SC as StudentController
+    participant SS as StudentService
+    participant SR as StudentRepository
+    participant DB as Database
+    SC ->> SS: registerStudentDetail(studentDetail)
+%% メールアドレスの重複チェック
+    SS ->> SR: existsByEmail(email)
+    SR ->> DB: SELECT COUNT(*) > 0 FROM students WHERE email = ?
+    DB -->> SR: true / false
+    SR -->> SS: 結果を返す
+
+    alt メールアドレスが既に存在する
+        SS -->> SC: NotUniqueException を throw
+    else メールアドレスが未登録
+        SS ->> SS: UUIDを生成しstudentのpublicIdにset
+    %% 学生情報の登録
+        SS ->> SR: registerStudent(student)
+        SR ->> DB: INSERT INTO students (...) VALUES (...)
+        DB -->> SR: studentId（自動採番）を返却
+        SR -->> SS: studentIdがstudentにsetされる
+    %% コース情報の登録（存在する場合）
+        alt studentCourseListがnullまたは空でない
+            loop 各 studentCourse
+                SS ->> SS: initializeStudentCourse(studentId, studentCourse)
+                SS ->> SR: registerStudentCourse(studentCourse)
+                SR ->> DB: INSERT INTO students_courses (...) VALUES (...)
+                DB -->> SR: courseId（自動採番）を返却
+            end
+        end
+
+        SS -->> SC: 登録済みの studentDetail を返却
+    end

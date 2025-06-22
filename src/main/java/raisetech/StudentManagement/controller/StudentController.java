@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
-import raisetech.StudentManagement.exception.custom.TestException;
 import raisetech.StudentManagement.service.StudentService;
 import raisetech.StudentManagement.validation.RegisterGroup;
 import raisetech.StudentManagement.validation.UpdateGroup;
@@ -68,7 +67,7 @@ public class StudentController {
    * @return 登録された受講生の詳細情報
    */
   @PostMapping("/registerStudent")
-  public ResponseEntity<StudentDetail> registerStudent(
+  public ResponseEntity<StudentDetail> registerStudentDetail(
       @Validated(RegisterGroup.class)
       @RequestBody StudentDetail studentDetail) throws NotUniqueException {
     StudentDetail registerStudentDetail = service.registerStudentDetail(studentDetail);
@@ -82,15 +81,11 @@ public class StudentController {
    * @return 更新結果のメッセージ（成功時）
    */
   @PutMapping("/updateStudent")
-  public ResponseEntity<String> updateStudent(
+  public ResponseEntity<String> updateStudentDetail(
       @Validated(UpdateGroup.class)
       @RequestBody StudentDetail studentDetail) throws NotUniqueException {
     service.updateStudentDetail(studentDetail);
     return ResponseEntity.ok("更新処理が完了しました");
   }
 
-  @GetMapping("/exception")
-  public StudentDetail getDetail() throws TestException {
-    throw new TestException("エラーが発生しました");
-  }
 }

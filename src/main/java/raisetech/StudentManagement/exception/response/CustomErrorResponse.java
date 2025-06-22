@@ -13,20 +13,20 @@ import org.springframework.http.HttpStatus;
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"errorCode", "errorStatus", "message", "fieldErrorMessages"})
-public class ErrorResponse {
+public class CustomErrorResponse {
 
   private int errorCode;
   private HttpStatus errorStatus;
   private String message;
   private Map<String, List<String>> fieldErrorMessages;
 
-  public ErrorResponse(HttpStatus status, Map<String, List<String>> fieldErrorMessages) {
+  public CustomErrorResponse(HttpStatus status, Map<String, List<String>> fieldErrorMessages) {
     this.errorCode = status.value();
     this.errorStatus = status;
     this.fieldErrorMessages = fieldErrorMessages;
   }
 
-  public ErrorResponse(HttpStatus status, String message) {
+  public CustomErrorResponse(HttpStatus status, String message) {
     this.errorCode = status.value();
     this.errorStatus = status;
     this.message = message;
