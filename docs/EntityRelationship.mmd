@@ -1,0 +1,24 @@
+erDiagram
+    STUDENT ||--o{ STUDENT_COURSE: has
+
+    STUDENTS {
+        Integer student_id PK "内部ID"
+        String public_id UK "外部公開用ID"
+        String full_name
+        String kana_name
+        String nickname
+        String email UK
+        String region
+        Integer age
+        String sex
+        String remark
+        boolean is_deleted
+    }
+
+    STUDENTS_COURSES {
+        Integer course_id PK
+        Integer student_id FK
+        String course
+        LocalDate start_date
+        LocalDate end_date
+    }

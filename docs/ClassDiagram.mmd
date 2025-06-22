@@ -1,0 +1,40 @@
+classDiagram
+    class StudentController {
+        - StudentService service
+        + getStudentList() List~StudentDetail~
+        + getStudentByPublicId(String): StudentDetail
+        + registerStudentDetail(StudentDetail): ResponseEntity~StudentDetail~
+        + updateStudentDetail(StudentDetail): ResponseEntity~String~
+        + getDetail(): StudentDetail
+    }
+
+    class StudentService {
+        - StudentRepository repository
+        - StudentConverter converter
+        + searchStudentDetailList(): List~StudentDetail~
+        + searchStudentDetailByPublicId(String): StudentDetail
+        + registerStudentDetail(StudentDetail): StudentDetail
+        + registerStudentCourse(Integer, List~StudentCourse~): void
+        + updateStudentDetail(StudentDetail): void
+    }
+
+    class StudentConverter {
+        + convertToStudentDetail(List~Student~, List~StudentCourse~): List~StudentDetail~
+    }
+
+    class StudentRepository {
+        + searchStudentList(): List~Student~
+        + searchStudentCourseList(): List~StudentCourse~
+        + searchStudentByPublicId(String): Student
+        + searchStudentCourseListByStudentId(Integer): List~StudentCourse~
+        + registerStudent(Student): void
+        + registerStudentCourse(StudentCourse): void
+        + updateStudent(Student): void
+        + updateStudentCourse(StudentCourse): void
+        + existsByEmail(String): boolean
+    }
+
+    StudentController --> StudentService
+    StudentService --> StudentRepository
+    StudentService --> StudentConverter
+
