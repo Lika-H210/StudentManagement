@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import raisetech.StudentManagement.exception.converter.ErrorResponseConverter;
 import raisetech.StudentManagement.exception.custom.IllegalResourceAccessException;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
-import raisetech.StudentManagement.exception.custom.TestException;
-import raisetech.StudentManagement.exception.response.ErrorResponse;
+import raisetech.StudentManagement.exception.response.CustomErrorResponse;
 
 /**
  * REST APIに関連する例外を一元的に処理するハンドラークラスです。 各例外を適切な形式のErrorResponseに変換して返します。
@@ -29,7 +28,7 @@ public class ApiExceptionHandler {
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ErrorResponse> handleRequestBodyValidation(
+  public ResponseEntity<CustomErrorResponse> handleRequestBodyValidation(
       MethodArgumentNotValidException ex) {
 
     // 開発者向けログ出力
@@ -40,13 +39,14 @@ public class ApiExceptionHandler {
         ex.getBindingResult().getFieldErrors());
 
     //最終表示内容
-    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, fieldErrors);
+    CustomErrorResponse errorResponse = new CustomErrorResponse(HttpStatus.BAD_REQUEST,
+        fieldErrors);
 
     return ResponseEntity.badRequest().body(errorResponse);
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
-  public ResponseEntity<ErrorResponse> handleRequestParamValidation(
+  public ResponseEntity<CustomErrorResponse> handleRequestParamValidation(
       ConstraintViolationException ex) {
 
     // 開発者向けログ出力
@@ -57,25 +57,26 @@ public class ApiExceptionHandler {
         ex.getConstraintViolations());
 
     //最終表示内容
-    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, fieldErrors);
+    CustomErrorResponse errorResponse = new CustomErrorResponse(HttpStatus.BAD_REQUEST,
+        fieldErrors);
 
     return ResponseEntity.badRequest().body(errorResponse);
   }
 
   @ExceptionHandler(NotUniqueException.class)
-  public ResponseEntity<ErrorResponse> handleNotUniqueException(NotUniqueException ex) {
+  public ResponseEntity<CustomErrorResponse> handleNotUniqueException(NotUniqueException ex) {
     // 開発者向けログ出力
     log.warn("Duplicate value error: {}", ex.getMessage(), ex);
 
     //表示内容
     HttpStatus status = HttpStatus.CONFLICT;
-    ErrorResponse errorResponse = new ErrorResponse(status, ex.getMessage());
+    CustomErrorResponse errorResponse = new CustomErrorResponse(status, ex.getMessage());
 
     return ResponseEntity.status(status).body(errorResponse);
   }
 
   @ExceptionHandler(IllegalResourceAccessException.class)
-  public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
+  public ResponseEntity<CustomErrorResponse> handleResourceNotFoundException(
       IllegalResourceAccessException ex) {
     // 開発者向けログ出力
     log.error("Attempted to access a resource that should exist but was not found: {}",
@@ -83,17 +84,12 @@ public class ApiExceptionHandler {
 
     //表示内容
     HttpStatus status = HttpStatus.NOT_FOUND;
-    ErrorResponse errorResponse = new ErrorResponse(status, ex.getMessage());
+    CustomErrorResponse errorResponse = new CustomErrorResponse(status, ex.getMessage());
 
     return ResponseEntity.status(status).body(errorResponse);
   }
 
   //Todo:Exception.classの想定外に発生した例外を一括対応する@ExceptionHandlerの実装
   //Todo:RuntimeException.classの想定外に発生した例外を一括対応する@ExceptionHandlerの実装
-
-  @ExceptionHandler(TestException.class)
-  public ResponseEntity<String> exceptionHandler(TestException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-  }
 
 }
