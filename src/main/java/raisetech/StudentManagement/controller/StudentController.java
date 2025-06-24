@@ -60,7 +60,8 @@ public class StudentController {
   )
   @ApiResponse(
       responseCode = "500",
-      description = "サーバー内部で予期しないエラーが発生した場合（※実際のレスポンス形式とは異なる可能性があります）",
+      description = "サーバー内部で予期しないエラーが発生した場合<br>"
+          + "（まだ未実装のため形式・内容が異なる可能性かあります。）",
       content = @Content(
           mediaType = "application/json",
           schema = @Schema(implementation = CustomErrorResponse.class)
@@ -88,7 +89,8 @@ public class StudentController {
   )
   @ApiResponse(
       responseCode = "400",
-      description = "登録内容がバリデーション条件を満たさない場合(※ExampleValueは実際のレスポンス項目・内容と異なる可能性があります。)",
+      description = "リクエストパラメータがバリデーションルールに適合しない場合<br>"
+          + "(errorCord,errorStatus,messageまたはfieldErrorMessagesが返ります。)",
       content = @Content(
           mediaType = "application/json",
           schema = @Schema(implementation = CustomErrorResponse.class)
@@ -96,19 +98,15 @@ public class StudentController {
   )
   @ApiResponse(
       responseCode = "404",
-      description = "対象IDの受講生が見つからなかった場合(※ExampleValueは実際のレスポンス項目・内容と異なる可能性があります。)",
-      content = @Content(
-          mediaType = "application/json",
-          schema = @Schema(implementation = CustomErrorResponse.class)
-      )
+      description = "対象IDの受講生が見つからなかった場合<br>"
+          + "(400同様の形式でerrorCord,errorStatus,messagesが返ります。fieldErrorMessagesは含みません。)",
+      content = @Content()
   )
   @ApiResponse(
       responseCode = "500",
-      description = "サーバー内部で予期しないエラーが発生した場合（※実際のレスポンス形式とは異なる可能性があります）",
-      content = @Content(
-          mediaType = "application/json",
-          schema = @Schema(implementation = CustomErrorResponse.class)
-      )
+      description = "サーバー内部で予期しないエラーが発生した場合<br>"
+          + "（400同様の形式で表示予定ですが未実装のため形式・内容が異なる可能性かあります。）",
+      content = @Content()
   )
   @GetMapping("/student/{publicId}")
   public StudentDetail getStudentByPublicId(
@@ -136,15 +134,8 @@ public class StudentController {
   )
   @ApiResponse(
       responseCode = "400",
-      description = "リクエストパラメータがバリデーションルールに適合しない場合(※ExampleValueは実際のレスポンス項目・内容と異なる可能性があります。)",
-      content = @Content(
-          mediaType = "application/json",
-          schema = @Schema(implementation = CustomErrorResponse.class)
-      )
-  )
-  @ApiResponse(
-      responseCode = "409",
-      description = "Emailの登録内容と同じEmailが既に登録済みの場合(※ExampleValueは実際のレスポンス項目・内容と異なる可能性があります。)",
+      description = "リクエストパラメータがバリデーションルールに適合しない場合<br>"
+          + "(errorCord,errorStatus,messageまたはfieldErrorMessagesが返ります。)",
       content = @Content(
           mediaType = "application/json",
           schema = @Schema(implementation = CustomErrorResponse.class)
@@ -152,11 +143,9 @@ public class StudentController {
   )
   @ApiResponse(
       responseCode = "500",
-      description = "サーバー内部で予期しないエラーが発生した場合（※実際のレスポンス形式とは異なる可能性があります）",
-      content = @Content(
-          mediaType = "application/json",
-          schema = @Schema(implementation = CustomErrorResponse.class)
-      )
+      description = "サーバー内部で予期しないエラーが発生した場合<br>"
+          + "（400同様の形式で表示予定ですが未実装のため形式・内容が異なる可能性かあります。）",
+      content = @Content()
   )
   @PostMapping("/registerStudent")
   public ResponseEntity<StudentDetail> registerStudentDetail(
@@ -184,15 +173,8 @@ public class StudentController {
   )
   @ApiResponse(
       responseCode = "400",
-      description = "リクエストパラメータがバリデーションルールに適合しない場合(※ExampleValueは実際のレスポンス項目・内容と異なる可能性があります。)",
-      content = @Content(
-          mediaType = "application/json",
-          schema = @Schema(implementation = CustomErrorResponse.class)
-      )
-  )
-  @ApiResponse(
-      responseCode = "409",
-      description = "Emailの登録内容と同じEmailが既に登録済みの場合(※ExampleValueは実際のレスポンス項目・内容と異なる可能性があります。)",
+      description = "リクエストパラメータがバリデーションルールに適合しない場合<br>"
+          + "(errorCord,errorStatus,messageまたはfieldErrorMessagesが返ります。)",
       content = @Content(
           mediaType = "application/json",
           schema = @Schema(implementation = CustomErrorResponse.class)
@@ -200,11 +182,9 @@ public class StudentController {
   )
   @ApiResponse(
       responseCode = "500",
-      description = "サーバー内部で予期しないエラーが発生した場合（※実際のレスポンス形式とは異なる可能性があります）",
-      content = @Content(
-          mediaType = "application/json",
-          schema = @Schema(implementation = CustomErrorResponse.class)
-      )
+      description = "サーバー内部で予期しないエラーが発生した場合<br>"
+          + "（400同様の形式で表示予定ですが未実装のため形式が異なる可能性かあります。）",
+      content = @Content()
   )
   @PutMapping("/updateStudent")
   public ResponseEntity<String> updateStudentDetail(
