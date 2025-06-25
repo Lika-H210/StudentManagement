@@ -69,7 +69,7 @@ public class ApiExceptionHandler {
     log.warn("Duplicate value error: {}", ex.getMessage(), ex);
 
     //表示内容
-    HttpStatus status = HttpStatus.CONFLICT;
+    HttpStatus status = HttpStatus.BAD_REQUEST;
     CustomErrorResponse errorResponse = new CustomErrorResponse(status, ex.getMessage());
 
     return ResponseEntity.status(status).body(errorResponse);
