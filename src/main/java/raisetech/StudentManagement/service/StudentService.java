@@ -127,7 +127,11 @@ public class StudentService {
   public void updateStudentDetail(StudentDetail studentDetail) throws NotUniqueException {
     //更新前チェック
     Student student = studentDetail.getStudent();
-    if (repository.existsByEmailExcludingPublicId(student.getPublicId(), student.getEmail())) {
+    String publicId = student.getPublicId();
+    if (repository.searchStudentByPublicId(publicId) == null) {
+      throw new IllegalResourceAccessException(
+          "受講生情報の取得中に問題が発生しました。システム管理者までご連絡ください。");
+    } else if (repository.existsByEmailExcludingPublicId(publicId, student.getEmail())) {
       throw new NotUniqueException("このメールアドレスは使用できません。");
     }
 
