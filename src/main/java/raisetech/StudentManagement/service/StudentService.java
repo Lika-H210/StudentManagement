@@ -80,10 +80,8 @@ public class StudentService {
 
     //コース情報の登録
     Integer studentId = studentDetail.getStudent().getStudentId();
-    if (studentDetail.getStudentCourseList() != null
-        && !studentDetail.getStudentCourseList().isEmpty()) {
-      registerStudentCourse(studentId, studentDetail.getStudentCourseList());
-    }
+    registerStudentCourse(studentId, studentDetail.getStudentCourseList());
+
     return studentDetail;
   }
 
@@ -95,13 +93,10 @@ public class StudentService {
    */
   @Transactional
   public void registerStudentCourse(Integer studentId, List<StudentCourse> studentCourseList) {
-    studentCourseList.stream()
-        .filter(studentCourse -> studentCourse.getCourse() != null && !studentCourse.getCourse()
-            .isEmpty())
-        .forEach(studentCourse -> {
-          initializeStudentCourse(studentId, studentCourse);
-          repository.registerStudentCourse(studentCourse);
-        });
+    studentCourseList.forEach(studentCourse -> {
+      initializeStudentCourse(studentId, studentCourse);
+      repository.registerStudentCourse(studentCourse);
+    });
   }
 
   /**
@@ -127,17 +122,19 @@ public class StudentService {
   public void updateStudentDetail(StudentDetail studentDetail) throws NotUniqueException {
     //更新前チェック
     Student student = studentDetail.getStudent();
-    if (repository.existsByEmailExcludingPublicId(student.getPublicId(), student.getEmail())) {
+    String publicId = student.getPublicId();
+    if (repository.searchStudentByPublicId(publicId) == null) {
+      throw new IllegalResourceAccessException(
+          "受講生情報の取得中に問題が発生しました。システム管理者までご連絡ください。");
+    } else if (repository.existsByEmailExcludingPublicId(publicId, student.getEmail())) {
       throw new NotUniqueException("このメールアドレスは使用できません。");
     }
 
     repository.updateStudent(studentDetail.getStudent());
-    if (studentDetail.getStudentCourseList() != null) {
-      studentDetail.getStudentCourseList()
-          .forEach(studentCourse -> {
-            repository.updateStudentCourse(studentCourse);
-          });
-    }
+    studentDetail.getStudentCourseList()
+        .forEach(studentCourse -> {
+          repository.updateStudentCourse(studentCourse);
+        });
   }
 
 }

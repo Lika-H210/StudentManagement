@@ -37,7 +37,7 @@ public class StudentDetail {
   @Schema(description = "受講コース情報")
   @JsonView({RequestViews.Register.class, RequestViews.Update.class})
   @NotNull(groups = {RegisterGroup.class, UpdateGroup.class},
-      message = "登録に必要な情報が不足しています。システム管理者にご連絡ください。")
+      message = "登録・更新処理に必要な情報が不足しています。システム管理者にご連絡ください。")
   @Valid
   private List<StudentCourse> studentCourseList;
 
