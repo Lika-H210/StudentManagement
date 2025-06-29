@@ -6,9 +6,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
@@ -20,8 +19,7 @@ import raisetech.StudentManagement.view.RequestViews;
  * 受講生情報（Student）と受講生に紐づく受講コース情報（StudentCourse）をまとめた受講生詳細情報クラスです。 主に画面表示やデータ入出力時のDTOとして使用されます。
  */
 @Schema(description = "受講生詳細情報")
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Validated
