@@ -105,7 +105,7 @@ public class StudentService {
    * @param studentId     対象の受講生 ID
    * @param studentCourse 初期設定対象の受講コース
    */
-  private void initializeStudentCourse(Integer studentId, StudentCourse studentCourse) {
+  void initializeStudentCourse(Integer studentId, StudentCourse studentCourse) {
     studentCourse.setStudentId(studentId);
     LocalDate startDate = studentCourse.getStartDate();
     if (startDate != null) {
