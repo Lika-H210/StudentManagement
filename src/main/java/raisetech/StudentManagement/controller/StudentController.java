@@ -25,7 +25,6 @@ import raisetech.StudentManagement.validation.RegisterGroup;
 import raisetech.StudentManagement.validation.UpdateGroup;
 import raisetech.StudentManagement.view.RequestViews;
 
-
 /**
  * 受講生情報の管理を行う REST API のコントローラーです。
  * <p>
@@ -41,7 +40,6 @@ public class StudentController {
   public StudentController(StudentService service) {
     this.service = service;
   }
-
 
   /**
    * 受講生の詳細情報一覧を取得します。(但し、キャンセル扱い(isDeleted=true)の受講生は除きます）
