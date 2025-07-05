@@ -97,4 +97,11 @@ class StudentControllerTest {
     verify(service, times(1)).updateStudentDetail(any(StudentDetail.class));
   }
 
+  //異常系
+  @Test
+  void 実装していないURLを入力された場合に404エラーとなること()
+      throws Exception {
+    mockMvc.perform(get("/XXX"))
+        .andExpect(status().isNotFound());
+  }
 }
