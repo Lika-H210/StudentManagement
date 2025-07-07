@@ -22,14 +22,14 @@ class StudentConverterTest {
   @Test
   void 受講生リストと受講コースリストからstudentIDに基づき適切なStudentDetailが返されること() {
     //前準備
-    Student student777 = studentWithStudentId(777);
-    Student student888 = studentWithStudentId(888);
-    Student student999 = studentWithStudentId(999);
+    Student student777 = createStudentWithStudentId(777);
+    Student student888 = createStudentWithStudentId(888);
+    Student student999 = createStudentWithStudentId(999);
 
-    StudentCourse student777Course1 = courseWithStudentId(777);
-    StudentCourse student777Course2 = courseWithStudentId(777);
-    StudentCourse student888Course1 = courseWithStudentId(888);
-    StudentCourse noiseCourse = courseWithStudentId(1999);
+    StudentCourse student777Course1 = createCourseWithStudentId(777);
+    StudentCourse student777Course2 = createCourseWithStudentId(777);
+    StudentCourse student888Course1 = createCourseWithStudentId(888);
+    StudentCourse noiseCourse = createCourseWithStudentId(1999);
 
     List<Student> studentList = List.of(student777, student888, student999);
     List<StudentCourse> studentCourseList = List.of(student777Course1, student777Course2,
@@ -54,7 +54,7 @@ class StudentConverterTest {
 
   @Test
   void 受講コースリストが空の場合に受講生と空コースリストからなる受講生詳細が返されること() {
-    Student student = studentWithStudentId(999);
+    Student student = createStudentWithStudentId(999);
     List<Student> studentList = List.of(student);
     List<StudentCourse> studentCourseList = List.of();
 
@@ -69,7 +69,7 @@ class StudentConverterTest {
   @Test
   void 受講生リストが空の場合に空のリストが返されること() {
     List<Student> studentList = List.of();
-    List<StudentCourse> studentCourseList = List.of(courseWithStudentId(999));
+    List<StudentCourse> studentCourseList = List.of(createCourseWithStudentId(999));
 
     List<StudentDetail> actual = sut.convertToStudentDetail(studentList, studentCourseList);
 
@@ -87,14 +87,14 @@ class StudentConverterTest {
   }
 
   //受講生IDのみを設定したStudentオブジェクトを生成する
-  private Student studentWithStudentId(Integer studentId) {
+  private Student createStudentWithStudentId(Integer studentId) {
     Student student = new Student();
     student.setStudentId(studentId);
     return student;
   }
 
   //受講生IDのみを設定したStudentCourseオブジェクトを生成する
-  private StudentCourse courseWithStudentId(Integer studentId) {
+  private StudentCourse createCourseWithStudentId(Integer studentId) {
     StudentCourse studentCourse = new StudentCourse();
     studentCourse.setStudentId(studentId);
     return studentCourse;
