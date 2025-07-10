@@ -205,14 +205,14 @@ class StudentRepositoryTest {
 
   //メースアドレスの重複チェック(チェック対象：全レコード）※登録処理を想定
   @Test
-  void 登録済みemaliで実行した場合にtrueが返ること() {
+  void 登録済みemailで実行した場合にtrueが返ること() {
     boolean actual = sut.existsByEmail("taro@example.com");
 
     assertThat(actual).isTrue();
   }
 
   @Test
-  void 登録済みemaliで照合した場合にfalseが返ること() {
+  void 登録済みemailで照合した場合にfalseが返ること() {
     boolean actual = sut.existsByEmail("Test@example");
 
     assertThat(actual).isFalse();
