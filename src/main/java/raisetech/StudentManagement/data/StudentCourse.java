@@ -7,7 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 import raisetech.StudentManagement.validation.RegisterGroup;
@@ -21,6 +23,8 @@ import raisetech.StudentManagement.view.RequestViews;
 @Getter
 @Setter
 @Validated
+@NoArgsConstructor
+@AllArgsConstructor
 public class StudentCourse {
 
   @Schema(description = "コースID", example = "1")
