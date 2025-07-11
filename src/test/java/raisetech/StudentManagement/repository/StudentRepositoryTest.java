@@ -85,6 +85,20 @@ class StudentRepositoryTest {
     assertThat(actual).isEmpty();
   }
 
+  //courseIDに紐づくコース申込ステータスの検索:複数の対象courseIdあり
+  @Test
+  void 複数のcourseID情報を含むリストを基にリスト中のcourseIDに紐づくコース申込ステータスのみのリストを返すこと() {
+    List<Integer> courseIdList = List.of(4, 6);
+
+    List<CourseStatus> actual = sut.searchCourseStatusListByCourseIdList(courseIdList);
+
+    List<Integer> actualCourseIdList = actual.stream()
+        .map(CourseStatus::getCourseId)
+        .toList();
+    assertThat(actual.size()).isEqualTo(2);
+    assertThat(actualCourseIdList).containsExactlyInAnyOrderElementsOf(courseIdList);
+  }
+
   //受講生登録処理
   @Test
   void 受講生登録処理実行後に受講生の全項目が登録されかつ引数のstudentに発効されたstudentIdがsetされていること() {

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -74,29 +75,61 @@ class StudentServiceTest {
         .convertToStudentDetail(studentList, courseDetailList);
   }
 
-  //受講生個人検索：正常系
+  //受講生個人検索：正常系:studentに紐づくコース情報あり
   @Test
-  void 受講生詳細個人取得処理でrepositoryが適切に呼び出されかつStudentDetailを返していること() {
+  void 受講生詳細個人取得処理でrepositoryおよびconverterが適切に呼び出されかつStudentDetailを返していること() {
+    //事前準備
     Integer studentId = 999;
     String publicId = "00000000-0000-0000-0000-000000000000";
     student.setStudentId(studentId);
-    List<StudentCourse> studentCourseList = new ArrayList<>();
-    List<CourseStatus> courseStatusList = new ArrayList<>();
-    List<CourseDetail> courseDetailList = new ArrayList<>();
+    Integer courseId = 888;
+    StudentCourse studentCourse = new StudentCourse();
+    studentCourse.setCourseId(courseId);
+    CourseStatus courseStatus = new CourseStatus();
+
+    List<StudentCourse> studentCourseList = List.of(studentCourse);
+    List<CourseStatus> courseStatusList = List.of(courseStatus);
+    List<CourseDetail> courseDetailList = List.of(new CourseDetail(studentCourse, courseStatus));
+
+    //期待値
+    List<Integer> expectedCourseIdList = List.of(courseId);
     StudentDetail expected = new StudentDetail(student, courseDetailList);
 
     when(repository.searchStudentByPublicId(publicId)).thenReturn(student);
     when(repository.searchStudentCourseListByStudentId(studentId)).thenReturn(studentCourseList);
-    //Todo:追加したStatusListの検索repositoryの検証
-    //Todo:追加したCourseDetailのconverterの検証
+    when(repository.searchCourseStatusListByCourseIdList(expectedCourseIdList)).thenReturn(
+        courseStatusList);
+    when(converter.convertToCourseDetail(studentCourseList, courseStatusList))
+        .thenReturn(courseDetailList);
+
+    //実行
+    StudentDetail actual = sut.searchStudentDetailByPublicId(publicId);
+
+    //検証
+    verify(repository, times(1)).searchStudentByPublicId(publicId);
+    verify(repository, times(1)).searchStudentCourseListByStudentId(studentId);
+    //repositoryの実行確認と共に期待通りのcourseIdListで処理できているかも確認
+    verify(repository, times(1)).searchCourseStatusListByCourseIdList(expectedCourseIdList);
+    verify(converter, times(1)).convertToCourseDetail(studentCourseList, courseStatusList);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  //受講生個人検索：正常系:studentに紐づくコース情報なしで早期リターン
+  @Test
+  void 受講生詳細個人取得処理で紐づくコース情報がない場合に早期リターンでCourseDetailが空リストのstudentDetailを返していること() {
+    Integer studentId = 999;
+    String publicId = "00000000-0000-0000-0000-000000000000";
+    student.setStudentId(studentId);
+
+    StudentDetail expected = new StudentDetail(student, List.of());
+
+    when(repository.searchStudentByPublicId(publicId)).thenReturn(student);
+    when(repository.searchStudentCourseListByStudentId(studentId)).thenReturn(List.of());
 
     StudentDetail actual = sut.searchStudentDetailByPublicId(publicId);
 
-    verify(repository, times(1)).searchStudentByPublicId(publicId);
-    verify(repository, times(1)).searchStudentCourseListByStudentId(studentId);
-    //Todo:追加したStatusListの検索repositoryの検証
-    //Todo:追加したCourseDetailのconverterの検証
-    assertEquals(expected, actual);
+    verify(repository, never()).searchCourseStatusListByCourseIdList(anyList());
+    assertThat(actual).isEqualTo(expected);
   }
 
   //受講生登録処理：正常系

@@ -1,6 +1,7 @@
 package raisetech.StudentManagement.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,10 +62,19 @@ public class StudentService {
 
     List<StudentCourse> studentCourseList = repository.searchStudentCourseListByStudentId(
         student.getStudentId());
-    //Todo:下記はrepository作成後要修正
-    List<CourseStatus> courseStatusList = List.of(new CourseStatus());
-    //Todo:下記はconverter作成後要修正
-    List<CourseDetail> courseDetailList = List.of(new CourseDetail());
+
+    if (studentCourseList.isEmpty()) {
+      return new StudentDetail(student, new ArrayList<>());
+    }
+
+    List<Integer> targetCourseIdList = studentCourseList.stream()
+        .map(StudentCourse::getCourseId)
+        .toList();
+    List<CourseStatus> courseStatusList = repository.searchCourseStatusListByCourseIdList(
+        targetCourseIdList);
+
+    List<CourseDetail> courseDetailList = converter.convertToCourseDetail(studentCourseList,
+        courseStatusList);
 
     return new StudentDetail(student, courseDetailList);
   }

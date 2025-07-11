@@ -31,6 +31,15 @@
     SELECT * FROM students_courses WHERE student_id = #{studentId}
   </select>
 
+  <!-- 指定コースIDと紐づくコース申込ステータス一覧 -->
+  <select id="searchCourseStatusListByCourseIdList" parameterType="list"
+    resultType="raisetech.StudentManagement.data.CourseStatus">
+    SELECT * FROM course_status WHERE course_id IN
+    <foreach collection="list" item="courseId" open="(" close=")" separator=",">
+      #{courseId}
+    </foreach>
+  </select>
+
   <!-- 受講生新規登録 -->
   <insert id="registerStudent" parameterType="raisetech.StudentManagement.data.Student"
     useGeneratedKeys="true" keyProperty="studentId">

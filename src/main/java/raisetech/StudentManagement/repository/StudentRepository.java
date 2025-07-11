@@ -51,6 +51,14 @@ public interface StudentRepository {
   List<StudentCourse> searchStudentCourseListByStudentId(Integer studentId);
 
   /**
+   * 指定されたコースIDと紐づくコース申込ステータス情報を取得します。
+   *
+   * @param courseIdList 検索対象のcourseIDのリスト
+   * @return 対象コースIDに紐づくコース申込ステータス（CourseStatus）のリスト
+   */
+  List<CourseStatus> searchCourseStatusListByCourseIdList(List<Integer> courseIdList);
+
+  /**
    * 受講生情報を新規登録します。主キー（studentId）は自動生成され、登録後にオブジェクトにセットされます。
    *
    * @param student 登録する受講生情報
