@@ -22,3 +22,14 @@ CREATE TABLE students_courses (
   end_date DATE,
   FOREIGN KEY (student_id) REFERENCES students(student_id)
 );
+
+CREATE TABLE course_status (
+  status_id INT PRIMARY KEY AUTO_INCREMENT,
+  course_id INT NOT NULL,
+  status VARCHAR(10) NOT NULL,
+  provisional_application_date DATE,
+  application_date DATE,
+  cancel_date DATE,
+  UNIQUE (course_id),
+  FOREIGN KEY (course_id) REFERENCES students_courses(course_id)
+);

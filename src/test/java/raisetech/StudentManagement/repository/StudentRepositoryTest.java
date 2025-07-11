@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 
@@ -30,6 +31,14 @@ class StudentRepositoryTest {
   @Test
   void DBのstudentsCoursesテーブル内で全件のデータが取得できていること() {
     List<StudentCourse> actual = sut.searchStudentCourseList();
+
+    assertThat(actual.size()).isEqualTo(7);
+  }
+
+  //コース申込ステータス全件検索
+  @Test
+  void DBのCourseStatusテーブル内で全件のデータが取得できていること() {
+    List<CourseStatus> actual = sut.searchCourseStatusList();
 
     assertThat(actual.size()).isEqualTo(7);
   }

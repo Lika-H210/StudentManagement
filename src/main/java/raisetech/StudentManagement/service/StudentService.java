@@ -38,11 +38,10 @@ public class StudentService {
    */
   public List<StudentDetail> searchStudentDetailList() {
     List<Student> studentList = repository.searchStudentList();
-    List<StudentCourse> searchStudentsCourseList = repository.searchStudentCourseList();
-    //Todo:下記はrepository作成後要修正
-    List<CourseStatus> courseStatusList = List.of();
-    //Todo:下記はconverter作成後要修正
-    List<CourseDetail> courseDetailList = List.of();
+    List<StudentCourse> studentsCourseList = repository.searchStudentCourseList();
+    List<CourseStatus> courseStatusList = repository.searchCourseStatusList();
+    List<CourseDetail> courseDetailList = converter.convertToCourseDetail(studentsCourseList,
+        courseStatusList);
     return converter.convertToStudentDetail(studentList, courseDetailList);
   }
 

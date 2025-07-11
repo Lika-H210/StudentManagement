@@ -94,6 +94,51 @@ class StudentConverterTest {
     assertThat(actual).isEmpty();
   }
 
+  //convertToCourseDetail:データの組み換え検証
+  @Test
+  void 受講コースとコース申込ステータスのリストから両リストに同じcourseID持つレコードのみをCourseDetailに変換しリスト化して返されること() {
+    //前準備
+    StudentCourse studentCourse888 = createCourseWithCourseId(888);
+    StudentCourse studentCourse999 = createCourseWithCourseId(999);
+
+    CourseStatus courseStatus777 = createStatusWithCourseId(777);
+    CourseStatus courseStatus888 = createStatusWithCourseId(888);
+
+    List<StudentCourse> studentCourseList = List.of(studentCourse888, studentCourse999);
+    List<CourseStatus> courseStatusList = List.of(courseStatus777, courseStatus888);
+
+    //期待値の設定
+    CourseDetail expectCourseDetail888 = new CourseDetail(studentCourse888, courseStatus888);
+    List<CourseDetail> expectCourseDetailList = List.of(expectCourseDetail888);
+
+    //実行
+    List<CourseDetail> actual = sut.convertToCourseDetail(studentCourseList, courseStatusList);
+
+    //検証
+    assertThat(actual.size()).isEqualTo(expectCourseDetailList.size());
+    assertThat(actual).isEqualTo(expectCourseDetailList);
+  }
+
+  @Test
+  void 受講コース情報のリストが空の場合に空のコース詳細情報が返されること() {
+    List<StudentCourse> studentCourseList = List.of();
+    List<CourseStatus> courseStatusList = List.of(createStatusWithCourseId(999));
+
+    List<CourseDetail> actual = sut.convertToCourseDetail(studentCourseList, courseStatusList);
+
+    assertThat(actual).isEmpty();
+  }
+
+  @Test
+  void コース申込ステータス情報のリストが空の場合に空のコース詳細情報が返されること() {
+    List<StudentCourse> studentCourseList = List.of(createCourseWithCourseId(999));
+    List<CourseStatus> courseStatusList = List.of();
+
+    List<CourseDetail> actual = sut.convertToCourseDetail(studentCourseList, courseStatusList);
+
+    assertThat(actual).isEmpty();
+  }
+
   //受講生IDのみを設定したStudentオブジェクトを生成する
   private Student createStudentWithStudentId(Integer studentId) {
     Student student = new Student();
@@ -106,6 +151,20 @@ class StudentConverterTest {
     StudentCourse studentCourse = new StudentCourse();
     studentCourse.setStudentId(studentId);
     return studentCourse;
+  }
+
+  //コースIDのみを設定したStudentCourseオブジェクトを生成する
+  private StudentCourse createCourseWithCourseId(Integer courseId) {
+    StudentCourse studentCourse = new StudentCourse();
+    studentCourse.setCourseId(courseId);
+    return studentCourse;
+  }
+
+  //コースIDのみを設定したCourseStatusオブジェクトを生成する
+  private CourseStatus createStatusWithCourseId(Integer courseId) {
+    CourseStatus courseStatus = new CourseStatus();
+    courseStatus.setCourseId(courseId);
+    return courseStatus;
   }
 
 }

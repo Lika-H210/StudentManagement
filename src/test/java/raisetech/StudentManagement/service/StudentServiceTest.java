@@ -59,15 +59,17 @@ class StudentServiceTest {
     List<CourseDetail> courseDetailList = new ArrayList<>();
     when(repository.searchStudentList()).thenReturn(studentList);
     when(repository.searchStudentCourseList()).thenReturn(studentsCourseList);
-    //Todo:StatusListの検索機能（repository）のthenReturn
-    //Todo:CourseDetailのconverterのthenReturn
+    when(repository.searchCourseStatusList()).thenReturn(courseStatusList);
+    when(converter.convertToCourseDetail(studentsCourseList, courseStatusList))
+        .thenReturn(courseDetailList);
 
     sut.searchStudentDetailList();
 
     verify(repository, times(1)).searchStudentList();
     verify(repository, times(1)).searchStudentCourseList();
-    //Todo:追加したStatusListの検索repositoryの検証
-    //Todo:追加したCourseDetailのconverterの検証
+    verify(repository, times(1)).searchCourseStatusList();
+    verify(converter, times(1))
+        .convertToCourseDetail(studentsCourseList, courseStatusList);
     verify(converter, times(1))
         .convertToStudentDetail(studentList, courseDetailList);
   }

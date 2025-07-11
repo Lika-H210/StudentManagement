@@ -3,6 +3,7 @@ package raisetech.StudentManagement.repository;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 
@@ -25,6 +26,13 @@ public interface StudentRepository {
    * @return 受講コース情報（StudentCourse）のリスト
    */
   List<StudentCourse> searchStudentCourseList();
+
+  /**
+   * 全コース申込ステータス情報を取得します。
+   *
+   * @return コース申込スタータス情報（CourseStatus）のリスト
+   */
+  List<CourseStatus> searchCourseStatusList();
 
   /**
    * publicIdに対応した受講生情報を取得します。
