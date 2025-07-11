@@ -6,8 +6,10 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.exception.custom.IllegalResourceAccessException;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
@@ -37,7 +39,11 @@ public class StudentService {
   public List<StudentDetail> searchStudentDetailList() {
     List<Student> studentList = repository.searchStudentList();
     List<StudentCourse> searchStudentsCourseList = repository.searchStudentCourseList();
-    return converter.convertToStudentDetail(studentList, searchStudentsCourseList);
+    //Todo:下記はrepository作成後要修正
+    List<CourseStatus> courseStatusList = List.of();
+    //Todo:下記はconverter作成後要修正
+    List<CourseDetail> courseDetailList = List.of();
+    return converter.convertToStudentDetail(studentList, courseDetailList);
   }
 
   /**
@@ -56,8 +62,12 @@ public class StudentService {
 
     List<StudentCourse> studentCourseList = repository.searchStudentCourseListByStudentId(
         student.getStudentId());
+    //Todo:下記はrepository作成後要修正
+    List<CourseStatus> courseStatusList = List.of(new CourseStatus());
+    //Todo:下記はconverter作成後要修正
+    List<CourseDetail> courseDetailList = List.of(new CourseDetail());
 
-    return new StudentDetail(student, studentCourseList);
+    return new StudentDetail(student, courseDetailList);
   }
 
   /**
@@ -80,22 +90,24 @@ public class StudentService {
 
     //コース情報の登録
     Integer studentId = studentDetail.getStudent().getStudentId();
-    registerStudentCourse(studentId, studentDetail.getStudentCourseList());
+    registerStudentCourse(studentId, studentDetail.getCourseDetailList());
 
     return studentDetail;
   }
 
   /**
-   * 指定された受講生IDに紐づく受講コースを登録します。初期値は必要に応じ設定されます。
+   * 指定された受講生IDに紐づく受講コース及びコース申込ステータスを登録します。初期値は必要に応じ設定されます。
    *
-   * @param studentId         対象の受講生の受講生のID
-   * @param studentCourseList 登録するコース情報
+   * @param studentId        対象の受講生の受講生のID
+   * @param courseDetailList 登録するコース詳細情報
    */
   @Transactional
-  public void registerStudentCourse(Integer studentId, List<StudentCourse> studentCourseList) {
-    studentCourseList.forEach(studentCourse -> {
-      initializeStudentCourse(studentId, studentCourse);
-      repository.registerStudentCourse(studentCourse);
+  public void registerStudentCourse(Integer studentId, List<CourseDetail> courseDetailList) {
+    courseDetailList.forEach(courseDetail -> {
+      initializeStudentCourse(studentId, courseDetail.getStudentCourse());
+      repository.registerStudentCourse(courseDetail.getStudentCourse());
+      //Todo:Statusの初期値の設定メソッドの作成後追加
+      //Todo:Status登録用repository作成後追加
     });
   }
 
@@ -131,9 +143,10 @@ public class StudentService {
     }
 
     repository.updateStudent(studentDetail.getStudent());
-    studentDetail.getStudentCourseList()
-        .forEach(studentCourse -> {
-          repository.updateStudentCourse(studentCourse);
+    studentDetail.getCourseDetailList()
+        .forEach(courseDetail -> {
+          repository.updateStudentCourse(courseDetail.getStudentCourse());
+          //Todo:Status更新用repository作成後追加
         });
   }
 

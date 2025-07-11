@@ -22,8 +22,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
 import raisetech.StudentManagement.repository.StudentRepository;
@@ -53,15 +55,21 @@ class StudentServiceTest {
   void 受講生詳細情報の全件取得処理でrepositoryとconverterを適切に呼び出せていること() {
     List<Student> studentList = new ArrayList<>();
     List<StudentCourse> studentsCourseList = new ArrayList<>();
+    List<CourseStatus> courseStatusList = new ArrayList<>();
+    List<CourseDetail> courseDetailList = new ArrayList<>();
     when(repository.searchStudentList()).thenReturn(studentList);
     when(repository.searchStudentCourseList()).thenReturn(studentsCourseList);
+    //Todo:StatusListの検索機能（repository）のthenReturn
+    //Todo:CourseDetailのconverterのthenReturn
 
     sut.searchStudentDetailList();
 
     verify(repository, times(1)).searchStudentList();
     verify(repository, times(1)).searchStudentCourseList();
+    //Todo:追加したStatusListの検索repositoryの検証
+    //Todo:追加したCourseDetailのconverterの検証
     verify(converter, times(1))
-        .convertToStudentDetail(studentList, studentsCourseList);
+        .convertToStudentDetail(studentList, courseDetailList);
   }
 
   //受講生個人検索：正常系
@@ -71,15 +79,21 @@ class StudentServiceTest {
     String publicId = "00000000-0000-0000-0000-000000000000";
     student.setStudentId(studentId);
     List<StudentCourse> studentCourseList = new ArrayList<>();
-    StudentDetail expected = new StudentDetail(student, studentCourseList);
+    List<CourseStatus> courseStatusList = new ArrayList<>();
+    List<CourseDetail> courseDetailList = new ArrayList<>();
+    StudentDetail expected = new StudentDetail(student, courseDetailList);
 
     when(repository.searchStudentByPublicId(publicId)).thenReturn(student);
     when(repository.searchStudentCourseListByStudentId(studentId)).thenReturn(studentCourseList);
+    //Todo:追加したStatusListの検索repositoryの検証
+    //Todo:追加したCourseDetailのconverterの検証
 
     StudentDetail actual = sut.searchStudentDetailByPublicId(publicId);
 
     verify(repository, times(1)).searchStudentByPublicId(publicId);
     verify(repository, times(1)).searchStudentCourseListByStudentId(studentId);
+    //Todo:追加したStatusListの検索repositoryの検証
+    //Todo:追加したCourseDetailのconverterの検証
     assertEquals(expected, actual);
   }
 
@@ -91,7 +105,8 @@ class StudentServiceTest {
     String email = "test@example.com";
     student.setEmail(email);
     StudentCourse studentCourse = new StudentCourse();
-    StudentDetail studentDetail = new StudentDetail(student, List.of(studentCourse));
+    CourseDetail courseDetail = new CourseDetail(studentCourse, null);
+    StudentDetail studentDetail = new StudentDetail(student, List.of(courseDetail));
 
     when(repository.existsByEmail(email)).thenReturn(false);
     doAnswer(invocation -> {
@@ -127,30 +142,35 @@ class StudentServiceTest {
   }
 
   //受講コース登録処理：正常系(複数コース登録）
+  //Todo:メソッド名要変更
   @Test
   void 受講コースの登録で複数コース登録時にripositoryとコース情報初期設定メソッドが登録回数分呼び出されていること() {
     Integer studentId = 999;
-    List<StudentCourse> studentCourseList = List.of(new StudentCourse(), new StudentCourse());
+    CourseDetail courseDetail1 = new CourseDetail(new StudentCourse(), null);
+    CourseDetail courseDetail2 = new CourseDetail(new StudentCourse(), null);
+    List<CourseDetail> courseDetailList = List.of(courseDetail1, courseDetail2);
 
-    sut.registerStudentCourse(studentId, studentCourseList);
+    sut.registerStudentCourse(studentId, courseDetailList);
 
-    verify(repository, times(studentCourseList.size())).registerStudentCourse(
+    verify(repository, times(courseDetailList.size())).registerStudentCourse(
         any(StudentCourse.class));
-    assertThat(studentCourseList)
-        .hasSize(studentCourseList.size())
-        .allSatisfy(course -> {
-          assertThat(course.getStudentId())
+    //Todo:Status登録処理のrepository検証を追加
+    assertThat(courseDetailList)
+        .hasSize(courseDetailList.size())
+        .allSatisfy(courseDetail -> {
+          assertThat(courseDetail.getStudentCourse().getStudentId())
               .isEqualTo(studentId);
         });
+    //Todo:Statusの初期値の設定メソッドの動作検証を追加
   }
 
   //受講コース登録処理：正常系(コース情報 空)
   @Test
   void 受講コースの登録でコースリストが空の時にripositoryは呼び出されないこと() {
     Integer studentId = 999;
-    List<StudentCourse> studentCourseList = List.of();
+    List<CourseDetail> courseDetailList = List.of();
 
-    sut.registerStudentCourse(studentId, studentCourseList);
+    sut.registerStudentCourse(studentId, courseDetailList);
 
     verify(repository, never()).registerStudentCourse(any(StudentCourse.class));
   }
@@ -180,7 +200,9 @@ class StudentServiceTest {
     assertNull(studentCourse.getEndDate());
   }
 
-  //受講生更新処理：正常系(複数コース更新）
+  //Todo:courseStatusの初期設定のテスト
+
+  //受講生更新処理：正常系(複数コース詳細情報を更新）
   @Test
   void 受講生詳細情報の更新処理で必要なrepositoryが適切な回数だけ呼び出されていること()
       throws NotUniqueException {
@@ -188,8 +210,10 @@ class StudentServiceTest {
     String email = "test@example.com";
     student.setEmail(email);
     student.setPublicId(publicId);
-    List<StudentCourse> studentCourseList = List.of(new StudentCourse(), new StudentCourse());
-    StudentDetail studentDetail = new StudentDetail(student, studentCourseList);
+    CourseDetail courseDetail1 = new CourseDetail(new StudentCourse(), new CourseStatus());
+    CourseDetail courseDetail2 = new CourseDetail(new StudentCourse(), new CourseStatus());
+    List<CourseDetail> courseDetailList = List.of(courseDetail1, courseDetail2);
+    StudentDetail studentDetail = new StudentDetail(student, courseDetailList);
 
     when(repository.searchStudentByPublicId(publicId)).thenReturn(student);
     when(repository.existsByEmailExcludingPublicId(publicId, email)).thenReturn(false);
@@ -200,11 +224,12 @@ class StudentServiceTest {
     verify(repository, times(1))
         .existsByEmailExcludingPublicId(publicId, email);
     verify(repository, times(1)).updateStudent(student);
-    verify(repository, times(studentCourseList.size())).updateStudentCourse(
+    verify(repository, times(courseDetailList.size())).updateStudentCourse(
         any(StudentCourse.class));
+    //Todo:ステータス更新処理のrepositoryの検証
   }
 
-  //受講生更新処理：正常系(更新コースリスト 空）
+  //受講生更新処理：正常系(空コース詳細情報リストで更新）
   @Test
   void 受講生詳細情報の更新処理で受講コース情報のrepositoryが実行されないこと()
       throws NotUniqueException {

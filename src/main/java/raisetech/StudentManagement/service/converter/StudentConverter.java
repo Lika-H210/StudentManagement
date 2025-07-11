@@ -3,7 +3,7 @@ package raisetech.StudentManagement.service.converter;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import raisetech.StudentManagement.data.Student;
-import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
 
 /**
@@ -14,13 +14,13 @@ import raisetech.StudentManagement.domain.StudentDetail;
 public class StudentConverter {
 
   public List<StudentDetail> convertToStudentDetail(List<Student> studentList,
-      List<StudentCourse> studentCourseList) {
+      List<CourseDetail> courseDetailList) {
 
     return studentList.stream()
         .map(student -> new StudentDetail(student,
-            studentCourseList.stream()
-                .filter(
-                    studentCourse -> studentCourse.getStudentId().equals(student.getStudentId()))
+            courseDetailList.stream()
+                .filter(courseDetail -> courseDetail.getStudentCourse().getStudentId()
+                    .equals(student.getStudentId()))
                 .toList()))
         .toList();
   }

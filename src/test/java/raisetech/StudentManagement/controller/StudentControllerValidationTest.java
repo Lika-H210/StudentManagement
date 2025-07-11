@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.testdata.TestDataFactory;
 import raisetech.StudentManagement.testdata.ValidationTestDataFactory;
@@ -110,11 +111,13 @@ public class StudentControllerValidationTest {
     );
   }
 
+  //Todo:CourseDetailのバリデーションチェック要
+
   @Test
   void 更新処理に対応するStudentDetailの入力チェックで異常が発生しないこと() {
     Student student = factory.createBaseStudent();
-    StudentCourse studentCourse = factory.createBaseCourse();
-    StudentDetail studentDetail = new StudentDetail(student, List.of(studentCourse));
+    CourseDetail courseDetail = factory.createBaseCourseDetail();
+    StudentDetail studentDetail = new StudentDetail(student, List.of(courseDetail));
 
     Set<ConstraintViolation<StudentDetail>> violations = validator
         .validate(studentDetail, UpdateGroup.class);
@@ -136,7 +139,7 @@ public class StudentControllerValidationTest {
   private static Stream<Arguments> studentDetailValidPattern() {
     TestDataFactory factory = new TestDataFactory();
     return Stream.of(
-        Arguments.of(new StudentDetail(null, List.of(factory.createBaseCourse())),
+        Arguments.of(new StudentDetail(null, List.of(factory.createBaseCourseDetail())),
             "受講生情報の入力は必須です。"),
         Arguments.of(new StudentDetail(factory.createBaseStudent(), null),
             "登録・更新処理に必要な情報が不足しています。システム管理者にご連絡ください。")
