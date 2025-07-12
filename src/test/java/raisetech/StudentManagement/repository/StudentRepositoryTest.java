@@ -248,6 +248,47 @@ class StudentRepositoryTest {
     assertThat(updatedStudentCourse.getStudentId()).isEqualTo(studentId);
   }
 
+  //コース申込ステータス更新処理：更新対応項目の更新確認
+  @Test
+  void コース申込ステータ更新処理実行後に更新対象にID項目と仮申込日以外の全項目の変更が反映されていること() {
+    CourseStatus courseStatus = createCourseStatusForCourseId3();
+    Integer courseId = courseStatus.getCourseId();
+    //CourseStatusのID項目と仮申込日以外変更
+    courseStatus.setStatus("キャンセル");
+    courseStatus.setApplicationDate(LocalDate.of(2000, 1, 1));
+    courseStatus.setCancelDate(LocalDate.of(2000, 2, 1));
+
+    sut.updateCourseStatus(courseStatus);
+
+    CourseStatus updatedCourseStatus = sut.searchCourseStatusListByCourseIdList(List.of(courseId))
+        .getFirst();
+
+    assertThat(updatedCourseStatus)
+        .usingRecursiveComparison()
+        .isEqualTo(courseStatus);
+  }
+
+  //コース申込ステータス更新処理：更新非対応項目の未更新確認
+  @Test
+  void コース申込ステータス更新処理実行後に更新対象にstatusIdと仮申込日に変更が反映されていないこと() {
+    CourseStatus courseStatus = createCourseStatusForCourseId3();
+    Integer courseId = courseStatus.getCourseId();
+    Integer statusId = courseStatus.getStatusId();
+    LocalDate provisionalApplicationDate = courseStatus.getProvisionalApplicationDate();
+    //CourseStatusのstatusIdと仮申込日を変更
+    courseStatus.setStatusId(999);
+    courseStatus.setProvisionalApplicationDate(LocalDate.of(2000, 1, 1));
+
+    sut.updateCourseStatus(courseStatus);
+
+    CourseStatus updatedCourseStatus = sut.searchCourseStatusListByCourseIdList(List.of(courseId))
+        .getFirst();
+
+    assertThat(updatedCourseStatus.getStatusId()).isEqualTo(statusId);
+    assertThat(updatedCourseStatus.getProvisionalApplicationDate())
+        .isEqualTo(provisionalApplicationDate);
+  }
+
   //メースアドレスの重複チェック(チェック対象：全レコード）※登録処理を想定
   @Test
   void 登録済みemailで実行した場合にtrueが返ること() {
@@ -314,6 +355,17 @@ class StudentRepositoryTest {
         "Pythonコース",
         LocalDate.of(2025, 2, 1),
         LocalDate.of(2025, 8, 1)
+    );
+  }
+
+  private CourseStatus createCourseStatusForCourseId3() {
+    return new CourseStatus(
+        3,
+        3,
+        "本申込",
+        LocalDate.of(2025, 7, 10),
+        LocalDate.of(2025, 7, 20),
+        null
     );
   }
 

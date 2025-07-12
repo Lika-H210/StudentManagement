@@ -174,7 +174,7 @@ public class StudentService {
     studentDetail.getCourseDetailList()
         .forEach(courseDetail -> {
           repository.updateStudentCourse(courseDetail.getStudentCourse());
-          //Todo:Status更新用repository作成後追加
+          repository.updateCourseStatus(courseDetail.getCourseStatus());
         });
   }
 

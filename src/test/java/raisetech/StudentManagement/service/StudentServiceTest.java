@@ -273,12 +273,13 @@ class StudentServiceTest {
     verify(repository, times(1)).updateStudent(student);
     verify(repository, times(courseDetailList.size())).updateStudentCourse(
         any(StudentCourse.class));
-    //Todo:ステータス更新処理のrepositoryの検証
+    verify(repository, times(courseDetailList.size())).updateCourseStatus(
+        any(CourseStatus.class));
   }
 
   //受講生更新処理：正常系(空コース詳細情報リストで更新）
   @Test
-  void 受講生詳細情報の更新処理で受講コース情報のrepositoryが実行されないこと()
+  void 受講生詳細情報の更新処理でコース詳細情報リストが空の場合に更新処理のrepositoryが実行されないこと()
       throws NotUniqueException {
     String publicId = "00000000-0000-0000-0000-000000000000";
     String email = "test@example.com";

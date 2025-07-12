@@ -94,6 +94,13 @@ public interface StudentRepository {
   void updateStudentCourse(StudentCourse studentCourse);
 
   /**
+   * courseIdに対応したコース申込ステータスを更新します。
+   *
+   * @param courseStatus 更新対象のコース申込ステータス
+   */
+  void updateCourseStatus(CourseStatus courseStatus);
+
+  /**
    * 指定されたメールアドレスが既に登録されているかを確認します。
    *
    * @param email 受講生のメールアドレス

@@ -98,6 +98,16 @@
     WHERE course_id = #{courseId}
   </update>
 
+  <!-- コース申込ステータス情報の更新 -->
+  <update id="updateCourseStatus" parameterType="raisetech.StudentManagement.data.CourseStatus">
+    UPDATE course_status
+    SET
+    status = #{status},
+    application_date = #{applicationDate},
+    cancel_date = #{cancelDate}
+    WHERE course_id = #{courseId}
+  </update>
+
   <!-- Emailの重複確認 登録時-->
   <select id="existsByEmail" resultType="boolean" parameterType="string">
     SELECT COUNT(*) > 0
