@@ -176,10 +176,9 @@ class StudentServiceTest {
     verify(repository, never()).registerStudent(any(Student.class));
   }
 
-  //受講コース登録処理：正常系(複数コース登録）
-  //Todo:メソッド名要変更
+  //コース詳細情報の登録処理：正常系(複数コース登録時）
   @Test
-  void 受講コースの登録で複数コース登録時にripositoryとコース情報初期設定メソッドが登録回数分呼び出されていること() {
+  void コース詳細情報登録で複数コース登録時にリストサイズ分の各repositoryと初期設定メソッドが呼び出されていること() {
     Integer studentId = 999;
     CourseDetail courseDetail1 = new CourseDetail(new StudentCourse(), null);
     CourseDetail courseDetail2 = new CourseDetail(new StudentCourse(), null);
@@ -189,14 +188,16 @@ class StudentServiceTest {
 
     verify(repository, times(courseDetailList.size())).registerStudentCourse(
         any(StudentCourse.class));
-    //Todo:Status登録処理のrepository検証を追加
+    verify(repository, times(courseDetailList.size())).registerCourseStatus(
+        any(CourseStatus.class));
     assertThat(courseDetailList)
         .hasSize(courseDetailList.size())
         .allSatisfy(courseDetail -> {
           assertThat(courseDetail.getStudentCourse().getStudentId())
               .isEqualTo(studentId);
+          assertThat(courseDetail.getCourseStatus())
+              .isNotNull();
         });
-    //Todo:Statusの初期値の設定メソッドの動作検証を追加
   }
 
   //受講コース登録処理：正常系(コース情報 空)
@@ -210,7 +211,7 @@ class StudentServiceTest {
     verify(repository, never()).registerStudentCourse(any(StudentCourse.class));
   }
 
-  //受講コース登録処理：登録項目の初期値設定(StudentCourseがstartDateを含む場合)
+  //コース登録項目の初期値設定(StudentCourseがstartDateを含む場合)
   @Test
   void 受講コース情報初期値としてstudentIdとendDateがstudentCourseに反映されていること() {
     Integer studentId = 999;
@@ -224,7 +225,7 @@ class StudentServiceTest {
     assertEquals(startDate.plusMonths(6), studentCourse.getEndDate());
   }
 
-  //受講コース登録処理：登録項目の初期値設定(StudentCourseのstartDateがnullの場合)
+  //コース登録項目の初期値設定(StudentCourseのstartDateがnullの場合)
   @Test
   void 受講コース情報初期値としてstartDateがnullの場合はendDateもnullであること() {
     Integer studentId = 999;
@@ -235,7 +236,18 @@ class StudentServiceTest {
     assertNull(studentCourse.getEndDate());
   }
 
-  //Todo:courseStatusの初期設定のテスト
+  //コース申込ステータスの初期オブジェクト生成
+  @Test
+  void コース申込ステータスのオブジェクトが適切な内容を含み生成されていること() {
+    Integer courseId = 888;
+
+    CourseStatus courseStatus = sut.initializeCourseStatus(courseId);
+
+    assertThat(courseStatus).isNotNull();
+    assertThat(courseStatus.getCourseId()).isEqualTo(courseId);
+    assertThat(courseStatus.getStatus()).isEqualTo("仮申込");
+    assertThat(courseStatus.getProvisionalApplicationDate()).isEqualTo(LocalDate.now());
+  }
 
   //受講生更新処理：正常系(複数コース詳細情報を更新）
   @Test

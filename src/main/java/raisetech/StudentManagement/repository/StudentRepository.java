@@ -73,6 +73,13 @@ public interface StudentRepository {
   void registerStudentCourse(StudentCourse studentCourse);
 
   /**
+   * コース申込ステータスを新規登録します。主キー（statusId）は自動生成され、登録後にオブジェクトにセットされます。
+   *
+   * @param courseStatus 登録するコース申込ステータス情報
+   */
+  void registerCourseStatus(CourseStatus courseStatus);
+
+  /**
    * publicIdに対応した受講生情報を更新します。
    *
    * @param student 更新対象の受講生情報

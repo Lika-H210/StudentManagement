@@ -32,7 +32,7 @@ class StudentRepositoryTest {
   void DBのstudentsCoursesテーブル内で全件のデータが取得できていること() {
     List<StudentCourse> actual = sut.searchStudentCourseList();
 
-    assertThat(actual.size()).isEqualTo(7);
+    assertThat(actual.size()).isEqualTo(8);
   }
 
   //コース申込ステータス全件検索
@@ -145,6 +145,28 @@ class StudentRepositoryTest {
     assertThat(studentCourseList)
         .usingRecursiveFieldByFieldElementComparator()
         .contains(studentCourse);
+  }
+
+  //コース申込ステータス登録処理
+  @Test
+  void コース申込ステータス登録処理実行後に() {
+    CourseStatus courseStatus = new CourseStatus(
+        null,
+        8,
+        "仮申込",
+        LocalDate.now(),
+        null,
+        null
+    );
+
+    sut.registerCourseStatus(courseStatus);
+
+    List<CourseStatus> courseStatusList = sut.searchCourseStatusListByCourseIdList(
+        List.of(courseStatus.getCourseId()));
+
+    assertThat(courseStatusList.getFirst())
+        .usingRecursiveComparison()
+        .isEqualTo(courseStatus);
   }
 
   //受講生更新処理：更新対応項目の更新確認

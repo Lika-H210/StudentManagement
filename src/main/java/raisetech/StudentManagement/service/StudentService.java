@@ -105,7 +105,7 @@ public class StudentService {
   }
 
   /**
-   * 指定された受講生IDに紐づく受講コース及びコース申込ステータスを登録します。初期値は必要に応じ設定されます。
+   * 指定された受講生IDに紐づくコース詳細情報を登録します。初期値は必要に応じ設定されます。
    *
    * @param studentId        対象の受講生の受講生のID
    * @param courseDetailList 登録するコース詳細情報
@@ -113,10 +113,15 @@ public class StudentService {
   @Transactional
   public void registerStudentCourse(Integer studentId, List<CourseDetail> courseDetailList) {
     courseDetailList.forEach(courseDetail -> {
+      //コースの初期値設定と登録
       initializeStudentCourse(studentId, courseDetail.getStudentCourse());
       repository.registerStudentCourse(courseDetail.getStudentCourse());
-      //Todo:Statusの初期値の設定メソッドの作成後追加
-      //Todo:Status登録用repository作成後追加
+
+      //ステータスの初期オブジェクト作成・登録・CourseDetailへの反映
+      CourseStatus courseStatus = initializeCourseStatus(
+          courseDetail.getStudentCourse().getCourseId());
+      repository.registerCourseStatus(courseStatus);
+      courseDetail.setCourseStatus(courseStatus);
     });
   }
 
@@ -132,6 +137,20 @@ public class StudentService {
     if (startDate != null) {
       studentCourse.setEndDate(startDate.plusMonths(6));
     }
+  }
+
+  /**
+   * 指定されたコースIDに対応する初期状態のコース申込ステータスを生成します。
+   *
+   * @param courseId 対象のコースID
+   * @return 初期状態のコース申込ステータスオブジェクト
+   */
+  CourseStatus initializeCourseStatus(Integer courseId) {
+    CourseStatus courseStatus = new CourseStatus();
+    courseStatus.setCourseId(courseId);
+    courseStatus.setStatus("仮申込");
+    courseStatus.setProvisionalApplicationDate(LocalDate.now());
+    return courseStatus;
   }
 
   /**

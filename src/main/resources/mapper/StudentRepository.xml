@@ -62,6 +62,16 @@
     )
   </insert>
 
+  <!-- コース申込ステータス新規登録 -->
+  <insert id="registerCourseStatus" parameterType="raisetech.StudentManagement.data.CourseStatus"
+    useGeneratedKeys="true" keyProperty="statusId">
+    INSERT INTO course_status (
+    course_id, status, provisional_application_date, application_date, cancel_date
+    ) VALUES (
+    #{courseId}, #{status}, #{provisionalApplicationDate}, #{applicationDate}, #{cancelDate}
+    )
+  </insert>
+
   <!-- 受講生情報の更新 -->
   <update id="updateStudent" parameterType="raisetech.StudentManagement.data.Student">
     UPDATE students
