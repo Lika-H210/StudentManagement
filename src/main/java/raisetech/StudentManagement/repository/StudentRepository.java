@@ -8,7 +8,8 @@ import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 
 /**
- * 受講生情報および受講コース情報に関するDBアクセス処理を定義するリポジトリインターフェースです。 対象テーブル：students、students_courses
+ * 受講生情報および受講コース情報及びコース申込ステータスに関するDBアクセス処理を定義するリポジトリインターフェースです。
+ * 対象テーブル：students、students_courses、course_status
  */
 @Mapper
 public interface StudentRepository {

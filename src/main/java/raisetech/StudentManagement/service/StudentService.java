@@ -18,7 +18,7 @@ import raisetech.StudentManagement.repository.StudentRepository;
 import raisetech.StudentManagement.service.converter.StudentConverter;
 
 /**
- * 受講生情報および受講コース情報の管理を行うサービスクラスです。 このクラスでは、受講生や受講コースの検索・登録・更新処理などのロジックを提供します。
+ * 受講生の詳細情報に関する検索・登録・更新などの業務ロジックを提供するサービスクラスです。 受講生情報、受講コース情報、コース申込ステータス情報が対象になります。
  */
 @Service
 public class StudentService {
