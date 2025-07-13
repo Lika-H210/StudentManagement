@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 
@@ -30,6 +31,14 @@ class StudentRepositoryTest {
   @Test
   void DBのstudentsCoursesテーブル内で全件のデータが取得できていること() {
     List<StudentCourse> actual = sut.searchStudentCourseList();
+
+    assertThat(actual.size()).isEqualTo(8);
+  }
+
+  //コース申込ステータス全件検索
+  @Test
+  void DBのCourseStatusテーブル内で全件のデータが取得できていること() {
+    List<CourseStatus> actual = sut.searchCourseStatusList();
 
     assertThat(actual.size()).isEqualTo(7);
   }
@@ -74,6 +83,20 @@ class StudentRepositoryTest {
     List<StudentCourse> actual = sut.searchStudentCourseListByStudentId(studentId);
 
     assertThat(actual).isEmpty();
+  }
+
+  //courseIDに紐づくコース申込ステータスの検索:複数の対象courseIdあり
+  @Test
+  void 複数のcourseID情報を含むリストを基にリスト中のcourseIDに紐づくコース申込ステータスのみのリストを返すこと() {
+    List<Integer> courseIdList = List.of(4, 6);
+
+    List<CourseStatus> actual = sut.searchCourseStatusListByCourseIdList(courseIdList);
+
+    List<Integer> actualCourseIdList = actual.stream()
+        .map(CourseStatus::getCourseId)
+        .toList();
+    assertThat(actual.size()).isEqualTo(2);
+    assertThat(actualCourseIdList).containsExactlyInAnyOrderElementsOf(courseIdList);
   }
 
   //受講生登録処理
@@ -122,6 +145,28 @@ class StudentRepositoryTest {
     assertThat(studentCourseList)
         .usingRecursiveFieldByFieldElementComparator()
         .contains(studentCourse);
+  }
+
+  //コース申込ステータス登録処理
+  @Test
+  void コース申込ステータス登録処理実行後に() {
+    CourseStatus courseStatus = new CourseStatus(
+        null,
+        8,
+        "仮申込",
+        LocalDate.now(),
+        null,
+        null
+    );
+
+    sut.registerCourseStatus(courseStatus);
+
+    List<CourseStatus> courseStatusList = sut.searchCourseStatusListByCourseIdList(
+        List.of(courseStatus.getCourseId()));
+
+    assertThat(courseStatusList.getFirst())
+        .usingRecursiveComparison()
+        .isEqualTo(courseStatus);
   }
 
   //受講生更新処理：更新対応項目の更新確認
@@ -203,6 +248,47 @@ class StudentRepositoryTest {
     assertThat(updatedStudentCourse.getStudentId()).isEqualTo(studentId);
   }
 
+  //コース申込ステータス更新処理：更新対応項目の更新確認
+  @Test
+  void コース申込ステータ更新処理実行後に更新対象にID項目と仮申込日以外の全項目の変更が反映されていること() {
+    CourseStatus courseStatus = createCourseStatusForCourseId3();
+    Integer courseId = courseStatus.getCourseId();
+    //CourseStatusのID項目と仮申込日以外変更
+    courseStatus.setStatus("キャンセル");
+    courseStatus.setApplicationDate(LocalDate.of(2000, 1, 1));
+    courseStatus.setCancelDate(LocalDate.of(2000, 2, 1));
+
+    sut.updateCourseStatus(courseStatus);
+
+    CourseStatus updatedCourseStatus = sut.searchCourseStatusListByCourseIdList(List.of(courseId))
+        .getFirst();
+
+    assertThat(updatedCourseStatus)
+        .usingRecursiveComparison()
+        .isEqualTo(courseStatus);
+  }
+
+  //コース申込ステータス更新処理：更新非対応項目の未更新確認
+  @Test
+  void コース申込ステータス更新処理実行後に更新対象にstatusIdと仮申込日に変更が反映されていないこと() {
+    CourseStatus courseStatus = createCourseStatusForCourseId3();
+    Integer courseId = courseStatus.getCourseId();
+    Integer statusId = courseStatus.getStatusId();
+    LocalDate provisionalApplicationDate = courseStatus.getProvisionalApplicationDate();
+    //CourseStatusのstatusIdと仮申込日を変更
+    courseStatus.setStatusId(999);
+    courseStatus.setProvisionalApplicationDate(LocalDate.of(2000, 1, 1));
+
+    sut.updateCourseStatus(courseStatus);
+
+    CourseStatus updatedCourseStatus = sut.searchCourseStatusListByCourseIdList(List.of(courseId))
+        .getFirst();
+
+    assertThat(updatedCourseStatus.getStatusId()).isEqualTo(statusId);
+    assertThat(updatedCourseStatus.getProvisionalApplicationDate())
+        .isEqualTo(provisionalApplicationDate);
+  }
+
   //メースアドレスの重複チェック(チェック対象：全レコード）※登録処理を想定
   @Test
   void 登録済みemailで実行した場合にtrueが返ること() {
@@ -269,6 +355,17 @@ class StudentRepositoryTest {
         "Pythonコース",
         LocalDate.of(2025, 2, 1),
         LocalDate.of(2025, 8, 1)
+    );
+  }
+
+  private CourseStatus createCourseStatusForCourseId3() {
+    return new CourseStatus(
+        3,
+        3,
+        "本申込",
+        LocalDate.of(2025, 7, 10),
+        LocalDate.of(2025, 7, 20),
+        null
     );
   }
 

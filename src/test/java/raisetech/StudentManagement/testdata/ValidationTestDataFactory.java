@@ -1,5 +1,7 @@
 package raisetech.StudentManagement.testdata;
 
+import java.time.LocalDate;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 
@@ -40,4 +42,23 @@ public class ValidationTestDataFactory {
     studentCourse.setCourse(invalidCourse);
     return studentCourse;
   }
+
+  public CourseStatus withInvalidStatus(String invalidStatus) {
+    CourseStatus courseStatus = baseFactory.createBaseStatus();
+    courseStatus.setStatus(invalidStatus);
+    return courseStatus;
+  }
+
+  public CourseStatus withInvalidApplicationDate(LocalDate invalidApplicationDate) {
+    CourseStatus courseStatus = baseFactory.createBaseStatus();
+    courseStatus.setApplicationDate(invalidApplicationDate);
+    return courseStatus;
+  }
+
+  public CourseStatus withInvalidCancelDate(LocalDate invalidCancelDate) {
+    CourseStatus courseStatus = baseFactory.createBaseStatus();
+    courseStatus.setCancelDate(invalidCancelDate);
+    return courseStatus;
+  }
+
 }

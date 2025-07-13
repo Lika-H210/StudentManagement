@@ -16,8 +16,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.exception.converter.ErrorResponseConverter;
 import raisetech.StudentManagement.service.StudentService;
@@ -66,7 +68,8 @@ class StudentControllerTest {
     TestDataFactory createData = new TestDataFactory();
     Student student = createData.createBaseStudentForRegister();
     StudentCourse studentCourse = createData.createBaseCourseForRegister();
-    StudentDetail studentDetail = new StudentDetail(student, List.of(studentCourse));
+    CourseDetail courseDetail = new CourseDetail(studentCourse, null);
+    StudentDetail studentDetail = new StudentDetail(student, List.of(courseDetail));
 
     String jsonStudentDetail = new ObjectMapper().writeValueAsString(studentDetail);
 
@@ -85,7 +88,9 @@ class StudentControllerTest {
     TestDataFactory createData = new TestDataFactory();
     Student student = createData.createBaseStudent();
     StudentCourse studentCourse = createData.createBaseCourse();
-    StudentDetail studentDetail = new StudentDetail(student, List.of(studentCourse));
+    CourseStatus courseStatus = createData.createBaseStatus();
+    CourseDetail courseDetail = new CourseDetail(studentCourse, courseStatus);
+    StudentDetail studentDetail = new StudentDetail(student, List.of(courseDetail));
 
     String jsonStudentDetail = new ObjectMapper().writeValueAsString(studentDetail);
 

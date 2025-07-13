@@ -26,9 +26,9 @@ import raisetech.StudentManagement.validation.UpdateGroup;
 import raisetech.StudentManagement.view.RequestViews;
 
 /**
- * 受講生情報の管理を行う REST API のコントローラーです。
+ * 受講生詳細情報（StudentDetail）の管理を行う REST API のコントローラーです。
  * <p>
- * このクラスでは受講生情報（StudentDetail）に関する取得・登録・更新の処理を提供します。
+ * このクラスでは受講生詳細情報に関する取得・登録・更新の処理を提供します。
  */
 @RestController
 @Validated
@@ -116,12 +116,12 @@ public class StudentController {
   }
 
   /**
-   * 受講生情報及び受講コース情報を新規登録します。
+   * 受講生情報及び受講コース詳細情報を新規登録します。
    *
    * @param studentDetail 登録する受講生の詳細情報
    * @return 登録された受講生の詳細情報
    */
-  @Operation(summary = "受講生登録処理", description = "受講生の登録と受講コースの登録を行います。(受講コース登録は任意)")
+  @Operation(summary = "受講生登録処理", description = "受講生情報とそれに関連する受講コース詳細情報の登録を行います。(受講コース詳細情報の登録は任意)")
   @ApiResponse(
       responseCode = "201",
       description = "正常に新規登録が完了した場合",
@@ -155,12 +155,12 @@ public class StudentController {
   }
 
   /**
-   * 受講生及び受講コース情報を更新します。
+   * 受講生及び受講コース詳細情報を更新します。
    *
    * @param studentDetail 更新する受講生の詳細情報
    * @return 更新結果のメッセージ（成功時）
    */
-  @Operation(summary = "受講生更新処理", description = "受講生とそれに紐づく受講コースの更新を行います。")
+  @Operation(summary = "受講生更新処理", description = "受講生情報とそれに関連する受講コース詳細情報の更新を行います。")
   @ApiResponse(
       responseCode = "200",
       description = "リクエストが正常に処理された場合",

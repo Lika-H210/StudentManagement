@@ -14,6 +14,11 @@
     SELECT * FROM students_courses
   </select>
 
+  <!-- 全コース申込ステータス情報を取得 -->
+  <select id="searchCourseStatusList" resultType="raisetech.StudentManagement.data.CourseStatus">
+    SELECT * FROM course_status
+  </select>
+
   <!-- PublicId による受講生情報の取得 -->
   <select id="searchStudentByPublicId" parameterType="string"
     resultType="raisetech.StudentManagement.data.Student">
@@ -24,6 +29,15 @@
   <select id="searchStudentCourseListByStudentId" parameterType="int"
     resultType="raisetech.StudentManagement.data.StudentCourse">
     SELECT * FROM students_courses WHERE student_id = #{studentId}
+  </select>
+
+  <!-- 指定コースIDと紐づくコース申込ステータス一覧 -->
+  <select id="searchCourseStatusListByCourseIdList" parameterType="list"
+    resultType="raisetech.StudentManagement.data.CourseStatus">
+    SELECT * FROM course_status WHERE course_id IN
+    <foreach collection="list" item="courseId" open="(" close=")" separator=",">
+      #{courseId}
+    </foreach>
   </select>
 
   <!-- 受講生新規登録 -->
@@ -45,6 +59,16 @@
     student_id, course, start_date, end_date
     ) VALUES (
     #{studentId}, #{course}, #{startDate}, #{endDate}
+    )
+  </insert>
+
+  <!-- コース申込ステータス新規登録 -->
+  <insert id="registerCourseStatus" parameterType="raisetech.StudentManagement.data.CourseStatus"
+    useGeneratedKeys="true" keyProperty="statusId">
+    INSERT INTO course_status (
+    course_id, status, provisional_application_date, application_date, cancel_date
+    ) VALUES (
+    #{courseId}, #{status}, #{provisionalApplicationDate}, #{applicationDate}, #{cancelDate}
     )
   </insert>
 
@@ -71,6 +95,16 @@
     course = #{course},
     start_date = #{startDate},
     end_date = #{endDate}
+    WHERE course_id = #{courseId}
+  </update>
+
+  <!-- コース申込ステータス情報の更新 -->
+  <update id="updateCourseStatus" parameterType="raisetech.StudentManagement.data.CourseStatus">
+    UPDATE course_status
+    SET
+    status = #{status},
+    application_date = #{applicationDate},
+    cancel_date = #{cancelDate}
     WHERE course_id = #{courseId}
   </update>
 
