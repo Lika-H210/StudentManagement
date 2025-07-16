@@ -91,7 +91,7 @@ class StudentServiceTest {
     verify(converter, times(1))
         .convertToCourseDetail(studentsCourseList, courseStatusList);
     verify(converter, times(1))
-        .convertToStudentDetail(studentList, courseDetailList);
+        .toStudentDetailFromAllStudents(studentList, courseDetailList);
     //repositoryの引数が正規化後のcriteriaであることの検証
     List<SearchCriteria> criteriaList = captor.getAllValues();
     assertThat(criteriaList)
@@ -120,7 +120,7 @@ class StudentServiceTest {
     verify(converter, times(1))
         .toStudentDetailFromStudentsWithCourse(studentList, courseDetailList);
     verify(converter, never())
-        .convertToStudentDetail(anyList(), anyList());
+        .toStudentDetailFromAllStudents(anyList(), anyList());
   }
 
   //受講生詳細条件検索：正常系:検索条件と合致する受講生なし
