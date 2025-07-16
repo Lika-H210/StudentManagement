@@ -12,12 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.domain.condition.SearchCondition;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
 import raisetech.StudentManagement.exception.response.CustomErrorResponse;
 import raisetech.StudentManagement.service.StudentService;
@@ -42,11 +44,13 @@ public class StudentController {
   }
 
   /**
-   * 受講生の詳細情報一覧を取得します。(但し、キャンセル扱い(isDeleted=true)の受講生は除きます）
+   * 検索条件と合致する受講生の詳細情報一覧を取得します。検索条件の指定がない場合は全受講生の受講生の受講生詳細情報を取得します。
+   * (但し、キャンセル扱い(isDeleted=true)の受講生は除きます）
    *
+   * @param condition 検索条件
    * @return 受講生詳細情報のリスト
    */
-  @Operation(summary = "受講生詳細一覧を取得", description = "受講生詳細情報の一覧を取得します。（但し、キャンセル扱いの受講生は除きます。）")
+  @Operation(summary = "受講生詳細一覧を取得", description = "検索条件に一致する受講生詳細情報の一覧を取得します。（但し、キャンセル扱いの受講生は除きます。）")
   @ApiResponse(
       responseCode = "200",
       description = "リクエストが正常に処理された場合",
@@ -57,17 +61,24 @@ public class StudentController {
       )
   )
   @ApiResponse(
-      responseCode = "500",
-      description = "サーバー内部で予期しないエラーが発生した場合<br>"
-          + "（まだ未実装のため形式・内容が異なる可能性かあります。）",
+      responseCode = "400",
+      description = "リクエストパラメータがバリデーションルールに適合しない場合<br>"
+          + "(errorCord,errorStatus,messageまたはfieldErrorMessagesが返ります。)",
       content = @Content(
           mediaType = "application/json",
           schema = @Schema(implementation = CustomErrorResponse.class)
       )
   )
+  @ApiResponse(
+      responseCode = "500",
+      description = "サーバー内部で予期しないエラーが発生した場合<br>"
+          + "（まだ未実装のため形式・内容が異なる可能性かあります。）",
+      content = @Content()
+  )
   @GetMapping("/studentList")
-  public List<StudentDetail> getStudentList() {
-    return service.searchStudentDetailList();
+  public List<StudentDetail> getStudentDetailList(
+      @Validated @ModelAttribute SearchCondition condition) {
+    return service.searchStudentDetailList(condition);
   }
 
   /**
