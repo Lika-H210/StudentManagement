@@ -1,5 +1,6 @@
 package raisetech.StudentManagement.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -11,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -21,6 +23,7 @@ import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.domain.criteria.SearchCriteria;
 import raisetech.StudentManagement.exception.converter.ErrorResponseConverter;
 import raisetech.StudentManagement.service.StudentService;
 import raisetech.StudentManagement.testdata.TestDataFactory;
@@ -40,14 +43,22 @@ class StudentControllerTest {
   @MockitoBean
   private ErrorResponseConverter errorResponseConverter;
 
-  //受講生全件検索：正常系
+  //受講生詳細条件検索：正常系
   @Test
-  void 受講生全件検索実行時に正常に処理が実行され適切なServiceが呼び出されていること()
+  void 受講生詳細条件検索実行時に正常に処理が実行され適切なServiceが呼び出されていること()
       throws Exception {
-    mockMvc.perform(get("/studentList"))
+    SearchCriteria expected = SearchCriteria.builder()
+        .fullName("田中")
+        .build();
+
+    mockMvc.perform(get("/studentList")
+            .param("fullName", "田中"))
         .andExpect(status().isOk());
 
-    verify(service, times(1)).searchStudentDetailList();
+    ArgumentCaptor<SearchCriteria> captor = ArgumentCaptor.forClass(SearchCriteria.class);
+
+    verify(service, times(1)).searchStudentDetailList(captor.capture());
+    assertThat(captor.getValue()).usingRecursiveComparison().isEqualTo(expected);
   }
 
   //受講生個人検索：正常系

@@ -21,6 +21,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import raisetech.StudentManagement.data.CourseStatus;
@@ -28,9 +29,11 @@ import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.domain.criteria.SearchCriteria;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
 import raisetech.StudentManagement.repository.StudentRepository;
 import raisetech.StudentManagement.service.converter.StudentConverter;
+import raisetech.StudentManagement.service.normalizer.SearchCriteriaNormalizer;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
@@ -41,38 +44,146 @@ class StudentServiceTest {
   @Mock
   private StudentConverter converter;
 
+  @Mock
+  private SearchCriteriaNormalizer normalizer;
+
   private StudentService sut;
 
   private Student student;
 
   @BeforeEach
   void setUp() {
-    sut = new StudentService(repository, converter);
+    sut = new StudentService(repository, converter, normalizer);
     student = new Student();
   }
 
-  //受講生全件検索：正常系
+  //受講生詳細条件検索：正常系:検索条件カナ名のみ
   @Test
-  void 受講生詳細情報の全件取得処理でrepositoryとconverterを適切に呼び出せていること() {
-    List<Student> studentList = new ArrayList<>();
+  void 受講生詳細条件検索で条件なしで検索した場合にrepositoryが正規化後の引数で適切に実行されかつ必要なconverterが呼び出されていること() {
+    //前準備
+    SearchCriteria criteria = SearchCriteria.builder().kanaName("やまだ").build();
+    List<Student> studentList = List.of(student);
     List<StudentCourse> studentsCourseList = new ArrayList<>();
     List<CourseStatus> courseStatusList = new ArrayList<>();
     List<CourseDetail> courseDetailList = new ArrayList<>();
-    when(repository.searchStudentList()).thenReturn(studentList);
-    when(repository.searchStudentCourseList()).thenReturn(studentsCourseList);
-    when(repository.searchCourseStatusList()).thenReturn(courseStatusList);
+
+    String normalizedKanaName = "ヤマダ";
+
+    when(repository.searchStudentList(any(SearchCriteria.class))).thenReturn(studentList);
+    when(repository.searchStudentCourseList(any(SearchCriteria.class)))
+        .thenReturn(studentsCourseList);
+    when(repository.searchCourseStatusList(any(SearchCriteria.class))).thenReturn(courseStatusList);
     when(converter.convertToCourseDetail(studentsCourseList, courseStatusList))
         .thenReturn(courseDetailList);
+    when(normalizer.kanaNameNormalize(criteria.getKanaName())).thenReturn(normalizedKanaName);
 
-    sut.searchStudentDetailList();
+    //期待値
+    SearchCriteria expectCriteria = SearchCriteria.builder().kanaName(normalizedKanaName).build();
 
-    verify(repository, times(1)).searchStudentList();
-    verify(repository, times(1)).searchStudentCourseList();
-    verify(repository, times(1)).searchCourseStatusList();
+    //実行
+    sut.searchStudentDetailList(criteria);
+
+    //メソッド呼び出しの検証
+    ArgumentCaptor<SearchCriteria> captor = ArgumentCaptor.forClass(SearchCriteria.class);
+    verify(repository, times(1)).searchStudentList(captor.capture());
+    verify(repository, times(1)).searchStudentCourseList(captor.capture());
+    verify(repository, times(1)).searchCourseStatusList(captor.capture());
     verify(converter, times(1))
         .convertToCourseDetail(studentsCourseList, courseStatusList);
     verify(converter, times(1))
         .convertToStudentDetail(studentList, courseDetailList);
+    //repositoryの引数が正規化後のcriteriaであることの検証
+    List<SearchCriteria> criteriaList = captor.getAllValues();
+    assertThat(criteriaList)
+        .hasSize(3)
+        .allSatisfy(cr -> assertThat(cr.getKanaName()).isEqualTo(expectCriteria.getKanaName()));
+  }
+
+  //受講生詳細条件検索：正常系:コース検索条件あり
+  @Test
+  void 受講生詳細条件検索でコース条件ありで検索した場合に早期リターンで適切なconverterを呼び出せていること() {
+    SearchCriteria criteria = SearchCriteria.builder().course("Java").build();
+    List<Student> studentList = List.of(student);
+    List<StudentCourse> studentsCourseList = new ArrayList<>();
+    List<CourseStatus> courseStatusList = new ArrayList<>();
+    List<CourseDetail> courseDetailList = new ArrayList<>();
+
+    when(repository.searchStudentList(any(SearchCriteria.class))).thenReturn(studentList);
+    when(repository.searchStudentCourseList(any(SearchCriteria.class))).thenReturn(
+        studentsCourseList);
+    when(repository.searchCourseStatusList(any(SearchCriteria.class))).thenReturn(courseStatusList);
+    when(converter.convertToCourseDetail(studentsCourseList, courseStatusList))
+        .thenReturn(courseDetailList);
+
+    sut.searchStudentDetailList(criteria);
+
+    verify(converter, times(1))
+        .toStudentDetailFromStudentsWithCourse(studentList, courseDetailList);
+    verify(converter, never())
+        .convertToStudentDetail(anyList(), anyList());
+  }
+
+  //受講生詳細条件検索：正常系:検索条件と合致する受講生なし
+  @Test
+  void 受講生詳細条件検索で条件に合致する受講生がいない場合に早期リターンで空リストが返されること() {
+    SearchCriteria criteria = SearchCriteria.builder().build();
+    List<Student> studentList = List.of();
+
+    when(repository.searchStudentList(any(SearchCriteria.class))).thenReturn(studentList);
+
+    List<StudentDetail> actual = sut.searchStudentDetailList(criteria);
+
+    verify(repository, never()).searchStudentCourseList(any(SearchCriteria.class));
+    assertThat(actual).isEmpty();
+  }
+
+  //検索条件正規化処理
+  @Test
+  void kanaNameのみが正規化され他の値は保持されたcriteriaが返されること() {
+    //非変換項目
+    String fullName = "山田";
+    String email = "yamada@example.com";
+    String region = "東京都";
+    Integer minAge = 20;
+    Integer maxAge = 30;
+    String sex = "男性";
+    String course = "Java";
+    String status = "受講中";
+
+    //変換対象項目（変換前と変換後）
+    String beforeKanaName = "やまだ";
+    String afterKanaName = "ヤマダ";
+    
+    SearchCriteria criteria = SearchCriteria.builder()
+        .fullName(fullName)
+        .kanaName(beforeKanaName)  // 正規化対象
+        .email(email)
+        .region(region)
+        .minAge(minAge)
+        .maxAge(maxAge)
+        .sex(sex)
+        .course(course)
+        .status(status)
+        .build();
+
+    SearchCriteria expected = SearchCriteria.builder()
+        .fullName(fullName)
+        .kanaName(afterKanaName) // 正規化済み
+        .email(email)
+        .region(region)
+        .minAge(minAge)
+        .maxAge(maxAge)
+        .sex(sex)
+        .course(course)
+        .status(status)
+        .build();
+
+    when(normalizer.kanaNameNormalize(criteria.getKanaName())).thenReturn(afterKanaName);
+
+    SearchCriteria actual = sut.normalizeCriteria(criteria);
+
+    verify(normalizer, times(1)).kanaNameNormalize(beforeKanaName);
+    assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
   }
 
   //受講生個人検索：正常系:studentに紐づくコース情報あり

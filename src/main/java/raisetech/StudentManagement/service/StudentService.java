@@ -2,6 +2,7 @@ package raisetech.StudentManagement.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,12 @@ import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.domain.criteria.SearchCriteria;
 import raisetech.StudentManagement.exception.custom.IllegalResourceAccessException;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
 import raisetech.StudentManagement.repository.StudentRepository;
 import raisetech.StudentManagement.service.converter.StudentConverter;
+import raisetech.StudentManagement.service.normalizer.SearchCriteriaNormalizer;
 
 /**
  * 受講生の詳細情報に関する検索・登録・更新などの業務ロジックを提供するサービスクラスです。 受講生情報、受講コース情報、コース申込ステータス情報が対象になります。
@@ -25,11 +28,14 @@ public class StudentService {
 
   private StudentRepository repository;
   private StudentConverter converter;
+  private SearchCriteriaNormalizer normalizer;
 
   @Autowired
-  public StudentService(StudentRepository repository, StudentConverter converter) {
+  public StudentService(StudentRepository repository, StudentConverter converter,
+      SearchCriteriaNormalizer normalizer) {
     this.repository = repository;
     this.converter = converter;
+    this.normalizer = normalizer;
   }
 
   /**
@@ -37,13 +43,40 @@ public class StudentService {
    *
    * @return 受講生詳細情報のリスト
    */
-  public List<StudentDetail> searchStudentDetailList() {
-    List<Student> studentList = repository.searchStudentList();
-    List<StudentCourse> studentsCourseList = repository.searchStudentCourseList();
-    List<CourseStatus> courseStatusList = repository.searchCourseStatusList();
+  public List<StudentDetail> searchStudentDetailList(SearchCriteria criteria) {
+    SearchCriteria normalizedCriteria = normalizeCriteria(criteria);
+
+    List<Student> studentList = repository.searchStudentList(normalizedCriteria);
+    if (studentList.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    List<StudentCourse> studentsCourseList = repository.searchStudentCourseList(normalizedCriteria);
+    List<CourseStatus> courseStatusList = repository.searchCourseStatusList(normalizedCriteria);
     List<CourseDetail> courseDetailList = converter.convertToCourseDetail(studentsCourseList,
         courseStatusList);
+
+    //CourseDetailに関連する検索項目がある場合はStudentDetailのCourseDetailList=Emptyは許容されない
+    if (criteria.hasCourseOrStatus()) {
+      return converter.toStudentDetailFromStudentsWithCourse(studentList, courseDetailList);
+    }
+
+    //CourseDetailに関連する検索項目がない場合はStudentDetailのCourseDetailList=Emptyを許容する
     return converter.convertToStudentDetail(studentList, courseDetailList);
+  }
+
+  SearchCriteria normalizeCriteria(SearchCriteria original) {
+    return SearchCriteria.builder()
+        .fullName(original.getFullName())
+        .kanaName(normalizer.kanaNameNormalize(original.getKanaName()))
+        .email(original.getEmail())
+        .region(original.getRegion())
+        .minAge(original.getMinAge())
+        .maxAge(original.getMaxAge())
+        .sex(original.getSex())
+        .course(original.getCourse())
+        .status(original.getStatus())
+        .build();
   }
 
   /**

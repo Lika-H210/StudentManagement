@@ -33,6 +33,24 @@ public class StudentConverter {
   }
 
   /**
+   * 受講生リストとコース詳細情報リストから受講生詳細情報のリストに変換するconverterです。
+   * 受講生の内、studentIdで紐づくコース詳細情報が存在する場合のみStudentDetailに変換しリストに含めます。
+   */
+  public List<StudentDetail> toStudentDetailFromStudentsWithCourse(
+      List<Student> studentList, List<CourseDetail> courseDetailList) {
+
+    Map<Integer, List<CourseDetail>> coursesMap = courseDetailList.stream()
+        .collect(
+            Collectors.groupingBy(courseDetail -> courseDetail.getStudentCourse().getStudentId()));
+
+    return studentList.stream()
+        .filter(student -> coursesMap.containsKey(student.getStudentId()))
+        .map(student -> new StudentDetail(student,
+            coursesMap.getOrDefault(student.getStudentId(), List.of())))
+        .toList();
+  }
+
+  /**
    * 受講コースリストとコース申込ステータスリストからコース詳細情報のリストに変換するconverterです。
    * 両リストに同じcourseIdのデータが存在するレコードのみをコース詳細情報に変換しリストに含めます。
    */
