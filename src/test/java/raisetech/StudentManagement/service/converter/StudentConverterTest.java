@@ -94,6 +94,63 @@ class StudentConverterTest {
     assertThat(actual).isEmpty();
   }
 
+  //toStudentDetailFromStudentsWithCourse：データ組み替え検証
+  @Test
+  void リスト中の受講生で紐づくコース詳細情報が存在する場合のみStudentDetailを生成しリスト化できていること() {
+    //前準備
+    Student student888 = createStudentWithStudentId(888);
+    Student student999 = createStudentWithStudentId(999);
+
+    StudentCourse student888Course1 = createCourseWithStudentId(888);
+    StudentCourse student888Course2 = createCourseWithStudentId(888);
+    StudentCourse noiseCourse = createCourseWithStudentId(1999);
+
+    CourseDetail courseDetail888Course1 = new CourseDetail(student888Course1, new CourseStatus());
+    CourseDetail courseDetail888Course2 = new CourseDetail(student888Course2, new CourseStatus());
+    CourseDetail courseDetailNoiseCourse = new CourseDetail(noiseCourse, new CourseStatus());
+
+    List<Student> studentList = List.of(student888, student999);
+    List<CourseDetail> courseDetailList = List.of(courseDetail888Course1, courseDetail888Course2,
+        courseDetailNoiseCourse);
+
+    //期待値の設定
+    StudentDetail expectStudentDetail888 = new StudentDetail(student888,
+        List.of(courseDetail888Course1, courseDetail888Course2));
+
+    //実行
+    List<StudentDetail> actual = sut.toStudentDetailFromStudentsWithCourse(studentList,
+        courseDetailList);
+
+    //検証
+    assertThat(actual)
+        .hasSize(1)
+        .containsExactly(expectStudentDetail888);
+  }
+
+  @Test
+  void コース詳細情報リストが空の場合に空のリストが返されていること() {
+    List<Student> studentList = List.of(createStudentWithStudentId(999));
+    List<CourseDetail> courseDetailList = List.of();
+
+    List<StudentDetail> actual = sut.toStudentDetailFromStudentsWithCourse(studentList,
+        courseDetailList);
+
+    //検証
+    assertThat(actual).isEmpty();
+  }
+
+  @Test
+  void 受講生情報リストが空の場合に空のリストが返されていること() {
+    List<Student> studentList = List.of();
+    List<CourseDetail> courseDetailList = List.of(
+        new CourseDetail(createCourseWithStudentId(999), new CourseStatus()));
+
+    List<StudentDetail> actual = sut
+        .toStudentDetailFromStudentsWithCourse(studentList, courseDetailList);
+
+    assertThat(actual).isEmpty();
+  }
+
   //convertToCourseDetail:データの組み換え検証
   @Test
   void 受講コースとコース申込ステータスのリストから両リストに同じcourseID持つレコードのみをCourseDetailに変換しリスト化して返されること() {
