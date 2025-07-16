@@ -20,9 +20,9 @@ class StudentConverterTest {
     sut = new StudentConverter();
   }
 
-  //convertToStudentDetail:データの組み換え検証
+  //toStudentDetailFromAllStudents:データの組み換え検証
   @Test
-  void 受講生リストと受講コース詳細リストからstudentIDに基づき適切なStudentDetailが返されること() {
+  void リスト中の全受講生に対し適切なコース詳細情報を割り当てたStudentDetailを生成しリスト化できていること() {
     //前準備
     Student student777 = createStudentWithStudentId(777);
     Student student888 = createStudentWithStudentId(888);
@@ -52,7 +52,7 @@ class StudentConverterTest {
         expectStudentDetail888, expectStudentDetail999);
 
     //実行
-    List<StudentDetail> actual = sut.convertToStudentDetail(studentList, courseDetailList);
+    List<StudentDetail> actual = sut.toStudentDetailFromAllStudents(studentList, courseDetailList);
 
     //検証
     assertThat(actual.size()).isEqualTo(expectStudentDetailList.size());
@@ -67,7 +67,7 @@ class StudentConverterTest {
 
     List<StudentDetail> expectStudentDetailList = List.of(new StudentDetail(student, List.of()));
 
-    List<StudentDetail> actual = sut.convertToStudentDetail(studentList, courseDetailList);
+    List<StudentDetail> actual = sut.toStudentDetailFromAllStudents(studentList, courseDetailList);
 
     assertThat(actual.size()).isEqualTo(expectStudentDetailList.size());
     assertThat(actual).isEqualTo(expectStudentDetailList);
@@ -79,7 +79,7 @@ class StudentConverterTest {
     List<CourseDetail> courseDetailList = List.of(
         new CourseDetail(createCourseWithStudentId(999), new CourseStatus()));
 
-    List<StudentDetail> actual = sut.convertToStudentDetail(studentList, courseDetailList);
+    List<StudentDetail> actual = sut.toStudentDetailFromAllStudents(studentList, courseDetailList);
 
     assertThat(actual).isEmpty();
   }
@@ -89,7 +89,7 @@ class StudentConverterTest {
     List<Student> studentList = List.of();
     List<CourseDetail> courseDetailList = List.of();
 
-    List<StudentDetail> actual = sut.convertToStudentDetail(studentList, courseDetailList);
+    List<StudentDetail> actual = sut.toStudentDetailFromAllStudents(studentList, courseDetailList);
 
     assertThat(actual).isEmpty();
   }

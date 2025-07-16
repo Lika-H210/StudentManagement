@@ -62,7 +62,7 @@ public class StudentService {
     }
 
     //CourseDetailに関連する検索項目がない場合はStudentDetailのCourseDetailList=Emptyを許容する
-    return converter.convertToStudentDetail(studentList, courseDetailList);
+    return converter.toStudentDetailFromAllStudents(studentList, courseDetailList);
   }
 
   SearchCondition SearchConditionFormatter(SearchCondition original) {
