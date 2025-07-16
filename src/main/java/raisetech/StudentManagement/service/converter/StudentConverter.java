@@ -18,9 +18,10 @@ import raisetech.StudentManagement.domain.StudentDetail;
 public class StudentConverter {
 
   /**
-   * 受講生リストとコース詳細情報リストから受講生詳細情報のリストに変換するconverterです。 受講生詳細情報は受講生情報を基に作成されます。
+   * 受講生リストとコース詳細情報リストから受講生詳細情報のリストに変換するconverterです。
+   * すべての受講生を対象とし、紐づくコース詳細情報が存在する場合はその情報を、存在しない場合は空のリストを用いて受講生詳細情報を構築します。
    */
-  public List<StudentDetail> convertToStudentDetail(List<Student> studentList,
+  public List<StudentDetail> toStudentDetailFromAllStudents(List<Student> studentList,
       List<CourseDetail> courseDetailList) {
 
     return studentList.stream()
