@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.condition.SearchCondition;
 
 @MybatisTest
 class StudentRepositoryTest {
@@ -17,30 +18,183 @@ class StudentRepositoryTest {
   @Autowired
   private StudentRepository sut;
 
-  //受講生全件取得（論理削除は除く)
+  //受講生条件検索：検索条件なしで受講生全件取得（論理削除は除く)
   @Test
-  void DBのstudentsテーブル内でisDeletedがfalseのデータのみ取得できていること() {
-    List<Student> actual = sut.searchStudentList();
+  void 検索条件なしでDBのstudentsテーブル内でisDeletedがfalseのデータのみ取得できていること() {
+    SearchCondition condition = SearchCondition.builder().build();
+    List<Student> actual = sut.searchStudentList(condition);
 
     assertThat(actual.size()).isEqualTo(5);
     assertThat(actual)
         .allSatisfy(student -> assertThat(student.isDeleted()).isEqualTo(false));
   }
 
-  //受講コース全件検索
+  //受講生条件検索：単独検索(Student.fullName：部分一致)
+  @Test
+  void fullNameの検索で適切な検索結果が返ってくること() {
+    String fullName = "太郎";
+    SearchCondition condition = SearchCondition.builder()
+        .fullName(fullName)
+        .build();
+
+    List<Student> actual = sut.searchStudentList(condition);
+
+    assertThat(actual.size()).isEqualTo(2);
+    assertThat(actual)
+        .allSatisfy(student -> assertThat(student.getFullName()).contains(fullName));
+  }
+
+  //受講生条件検索：単独検索(Student.kanaName：部分一致)
+  @Test
+  void kanaName検索で適切な検索結果が返ってくること() {
+    String kanaName = "タロ";
+    SearchCondition condition = SearchCondition.builder()
+        .kanaName(kanaName)
+        .build();
+
+    List<Student> actual = sut.searchStudentList(condition);
+
+    assertThat(actual.size()).isEqualTo(2);
+    assertThat(actual)
+        .allSatisfy(student -> assertThat(student.getKanaName()).contains(kanaName));
+  }
+
+  //受講生条件検索：単独検索(Student.email：完全一致)
+  @Test
+  void email検索で適切な検索結果が返ってくること() {
+    String email = "suzuki@example.com";
+    SearchCondition condition = SearchCondition.builder()
+        .email(email)
+        .build();
+
+    List<Student> actual = sut.searchStudentList(condition);
+
+    assertThat(actual.size()).isEqualTo(1);
+    assertThat(actual.getFirst().getEmail()).isEqualTo(email);
+  }
+
+  //受講生条件検索：単独検索(Student.region：部分一致)
+  @Test
+  void region検索で適切な検索結果が返ってくること() {
+    String region = "都";
+    SearchCondition condition = SearchCondition.builder()
+        .region(region)
+        .build();
+
+    List<Student> actual = sut.searchStudentList(condition);
+
+    assertThat(actual.size()).isEqualTo(2);
+    assertThat(actual)
+        .allSatisfy(student -> assertThat(student.getRegion()).contains(region));
+  }
+
+  //受講生条件検索：単独検索(Student.age：対象数値以上)
+  @Test
+  void minAge検索で適切な検索結果が返ってくること() {
+    Integer minAge = 30;
+    SearchCondition condition = SearchCondition.builder()
+        .minAge(minAge)
+        .build();
+
+    List<Student> actual = sut.searchStudentList(condition);
+
+    assertThat(actual.size()).isEqualTo(2);
+    assertThat(actual)
+        .allSatisfy(student -> assertThat(student.getAge()).isGreaterThanOrEqualTo(minAge));
+  }
+
+  //受講生条件検索：単独検索(Student.age：対象数値以下)
+  @Test
+  void maxAge検索で適切な検索結果が返ってくること() {
+    Integer maxAge = 30;
+    SearchCondition condition = SearchCondition.builder()
+        .maxAge(maxAge)
+        .build();
+
+    List<Student> actual = sut.searchStudentList(condition);
+
+    assertThat(actual.size()).isEqualTo(2);
+    assertThat(actual)
+        .allSatisfy(student -> assertThat(student.getAge()).isLessThanOrEqualTo(maxAge));
+  }
+
+  //受講生条件検索：単独検索(Student.sex：完全一致)
+  @Test
+  void sex検索で適切な検索結果が返ってくること() {
+    String sex = "女性";
+    SearchCondition condition = SearchCondition.builder()
+        .sex(sex)
+        .build();
+
+    List<Student> actual = sut.searchStudentList(condition);
+
+    assertThat(actual.size()).isEqualTo(1);
+    assertThat(actual.getFirst().getSex()).isEqualTo(sex);
+  }
+
+  //受講生条件検索：複数条件検索(Student.age：規定範囲内)
+  @Test
+  void minAgeとmaxAgeの間の年齢のみ検索結果として返ってくること() {
+    Integer minAge = 29;
+    Integer maxAge = 31;
+    SearchCondition condition = SearchCondition.builder()
+        .minAge(minAge)
+        .maxAge(maxAge)
+        .build();
+
+    List<Student> actual = sut.searchStudentList(condition);
+
+    assertThat(actual.size()).isEqualTo(1);
+    assertThat(actual.getFirst().getAge()).isLessThanOrEqualTo(maxAge);
+    assertThat(actual.getFirst().getAge()).isGreaterThanOrEqualTo(minAge);
+  }
+
+  //受講コース条件検索:検索条件なしで全受講コース取得
   @Test
   void DBのstudentsCoursesテーブル内で全件のデータが取得できていること() {
-    List<StudentCourse> actual = sut.searchStudentCourseList();
+    SearchCondition condition = SearchCondition.builder().build();
+    List<StudentCourse> actual = sut.searchStudentCourseList(condition);
 
     assertThat(actual.size()).isEqualTo(8);
   }
 
-  //コース申込ステータス全件検索
+  //受講コース条件検索：単独検索(StudentCourse.course：部分一致)
+  @Test
+  void course検索で適切な検索結果が返ってくること() {
+    String course = "Python";
+    SearchCondition condition = SearchCondition.builder()
+        .course(course)
+        .build();
+
+    List<StudentCourse> actual = sut.searchStudentCourseList(condition);
+
+    assertThat(actual.size()).isEqualTo(2);
+    assertThat(actual)
+        .allSatisfy(student -> assertThat(student.getCourse()).contains(course));
+  }
+
+  //コース申込ステータス条件検索:検索条件なしで全コース申込ステータス取得
   @Test
   void DBのCourseStatusテーブル内で全件のデータが取得できていること() {
-    List<CourseStatus> actual = sut.searchCourseStatusList();
+    SearchCondition condition = SearchCondition.builder().build();
+    List<CourseStatus> actual = sut.searchCourseStatusList(condition);
 
     assertThat(actual.size()).isEqualTo(7);
+  }
+
+  //コース申込ステータス条件検索：単独検索(CourseStatus.status：完全一致)
+  @Test
+  void status検索で適切な検索結果が返ってくること() {
+    String status = "キャンセル";
+    SearchCondition condition = SearchCondition.builder()
+        .status(status)
+        .build();
+
+    List<CourseStatus> actual = sut.searchCourseStatusList(condition);
+
+    assertThat(actual.size()).isEqualTo(2);
+    assertThat(actual)
+        .allSatisfy(student -> assertThat(student.getStatus()).isEqualTo(status));
   }
 
   //publicIDに基づく受講生個人検索:publicId登録あり

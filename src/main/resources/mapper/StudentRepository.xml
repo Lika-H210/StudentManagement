@@ -4,19 +4,55 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="raisetech.StudentManagement.repository.StudentRepository">
-  <!-- 全受講生の情報を取得（キャンセルは除外） -->
-  <select id="searchStudentList" resultType="raisetech.StudentManagement.data.Student">
-    SELECT * FROM students WHERE is_deleted = false
+  <!-- 検索条件に合致する受講生の情報を取得（キャンセルは除外） -->
+  <select id="searchStudentList"
+    parameterType="raisetech.StudentManagement.domain.condition.SearchCondition"
+    resultType="raisetech.StudentManagement.data.Student">
+    SELECT * FROM students
+    WHERE is_deleted = false
+    <if test="fullName != null and fullName != ''">
+      AND full_Name LIKE CONCAT('%', #{fullName}, '%')
+    </if>
+    <if test="kanaName != null and kanaName != ''">
+      AND kana_name LIKE CONCAT('%', #{kanaName}, '%')
+    </if>
+    <if test="email != null and email != ''">
+      AND email = #{email}
+    </if>
+    <if test="region != null and region != ''">
+      AND region LIKE CONCAT('%', #{region}, '%')
+    </if>
+    <if test="minAge != null">
+      AND age &gt;= #{minAge}
+    </if>
+    <if test="maxAge != null">
+      AND age &lt;= #{maxAge}
+    </if>
+    <if test="sex != null and sex != ''">
+      AND sex = #{sex}
+    </if>
   </select>
 
-  <!-- 全受講コース情報を取得 -->
-  <select id="searchStudentCourseList" resultType="raisetech.StudentManagement.data.StudentCourse">
+  <!-- 検索条件に合致する受講コース情報を取得 -->
+  <select id="searchStudentCourseList"
+    parameterType="raisetech.StudentManagement.domain.condition.SearchCondition"
+    resultType="raisetech.StudentManagement.data.StudentCourse">
     SELECT * FROM students_courses
+    WHERE 1 = 1
+    <if test="course != null and course != ''">
+      AND course LIKE CONCAT('%', #{course}, '%')
+    </if>
   </select>
 
-  <!-- 全コース申込ステータス情報を取得 -->
-  <select id="searchCourseStatusList" resultType="raisetech.StudentManagement.data.CourseStatus">
+  <!-- 検索条件に合致するコース申込ステータス情報を取得 -->
+  <select id="searchCourseStatusList"
+    parameterType="raisetech.StudentManagement.domain.condition.SearchCondition"
+    resultType="raisetech.StudentManagement.data.CourseStatus">
     SELECT * FROM course_status
+    WHERE 1 = 1
+    <if test="status != null and status != ''">
+      AND status = #{status}
+    </if>
   </select>
 
   <!-- PublicId による受講生情報の取得 -->

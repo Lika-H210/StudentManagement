@@ -28,9 +28,11 @@ import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.CourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.domain.condition.SearchCondition;
 import raisetech.StudentManagement.exception.custom.NotUniqueException;
 import raisetech.StudentManagement.repository.StudentRepository;
 import raisetech.StudentManagement.service.converter.StudentConverter;
+import raisetech.StudentManagement.service.formatter.SearchConditionFormatter;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
@@ -41,38 +43,137 @@ class StudentServiceTest {
   @Mock
   private StudentConverter converter;
 
+  @Mock
+  private SearchConditionFormatter formatter;
+
   private StudentService sut;
 
   private Student student;
 
   @BeforeEach
   void setUp() {
-    sut = new StudentService(repository, converter);
+    sut = new StudentService(repository, converter, formatter);
     student = new Student();
   }
 
-  //受講生全件検索：正常系
+  //受講生詳細条件検索：正常系:検索条件カナ名のみ
   @Test
-  void 受講生詳細情報の全件取得処理でrepositoryとconverterを適切に呼び出せていること() {
-    List<Student> studentList = new ArrayList<>();
+  void 受講生詳細条件検索で条件なしで検索した場合にrepositoryが正規化後の引数で適切に実行されかつ必要なconverterが呼び出されていること() {
+    //前準備
+    SearchCondition condition = SearchCondition.builder().build();
+    List<Student> studentList = List.of(student);
     List<StudentCourse> studentsCourseList = new ArrayList<>();
     List<CourseStatus> courseStatusList = new ArrayList<>();
     List<CourseDetail> courseDetailList = new ArrayList<>();
-    when(repository.searchStudentList()).thenReturn(studentList);
-    when(repository.searchStudentCourseList()).thenReturn(studentsCourseList);
-    when(repository.searchCourseStatusList()).thenReturn(courseStatusList);
+
+    when(repository.searchStudentList(any(SearchCondition.class))).thenReturn(studentList);
+    when(repository.searchStudentCourseList(any(SearchCondition.class)))
+        .thenReturn(studentsCourseList);
+    when(repository.searchCourseStatusList(any(SearchCondition.class)))
+        .thenReturn(courseStatusList);
     when(converter.convertToCourseDetail(studentsCourseList, courseStatusList))
         .thenReturn(courseDetailList);
 
-    sut.searchStudentDetailList();
+    //実行
+    sut.searchStudentDetailList(condition);
 
-    verify(repository, times(1)).searchStudentList();
-    verify(repository, times(1)).searchStudentCourseList();
-    verify(repository, times(1)).searchCourseStatusList();
+    //メソッド呼び出しの検証(SearchConditionFormatterの呼び出しはformatterの呼び出しで間接的に確認）
+    verify(formatter, times(1)).kanaNameFormatter(condition.getKanaName());
+    verify(repository, times(1)).searchStudentList(any(SearchCondition.class));
+    verify(repository, times(1)).searchStudentCourseList(any(SearchCondition.class));
+    verify(repository, times(1)).searchCourseStatusList(any(SearchCondition.class));
     verify(converter, times(1))
         .convertToCourseDetail(studentsCourseList, courseStatusList);
     verify(converter, times(1))
-        .convertToStudentDetail(studentList, courseDetailList);
+        .toStudentDetailFromAllStudents(studentList, courseDetailList);
+  }
+
+  //受講生詳細条件検索：正常系:コース検索条件あり
+  @Test
+  void 受講生詳細条件検索でコース条件ありで検索した場合に早期リターンで適切なconverterを呼び出せていること() {
+    SearchCondition condition = SearchCondition.builder().course("Java").build();
+    List<Student> studentList = List.of(student);
+    List<StudentCourse> studentsCourseList = new ArrayList<>();
+    List<CourseStatus> courseStatusList = new ArrayList<>();
+    List<CourseDetail> courseDetailList = new ArrayList<>();
+
+    when(repository.searchStudentList(any(SearchCondition.class))).thenReturn(studentList);
+    when(repository.searchStudentCourseList(any(SearchCondition.class))).thenReturn(
+        studentsCourseList);
+    when(repository.searchCourseStatusList(any(SearchCondition.class))).thenReturn(
+        courseStatusList);
+    when(converter.convertToCourseDetail(studentsCourseList, courseStatusList))
+        .thenReturn(courseDetailList);
+
+    sut.searchStudentDetailList(condition);
+
+    verify(converter, times(1))
+        .toStudentDetailFromStudentsWithCourse(studentList, courseDetailList);
+    verify(converter, never())
+        .toStudentDetailFromAllStudents(anyList(), anyList());
+  }
+
+  //受講生詳細条件検索：正常系:検索条件と合致する受講生なし
+  @Test
+  void 受講生詳細条件検索で条件に合致する受講生がいない場合に早期リターンで空リストが返されること() {
+    SearchCondition condition = SearchCondition.builder().build();
+    List<Student> studentList = List.of();
+
+    when(repository.searchStudentList(any(SearchCondition.class))).thenReturn(studentList);
+
+    List<StudentDetail> actual = sut.searchStudentDetailList(condition);
+
+    verify(repository, never()).searchStudentCourseList(any(SearchCondition.class));
+    assertThat(actual).isEmpty();
+  }
+
+  //検索条件正規化処理
+  @Test
+  void kanaNameのみが変換され他の値は保持されたconditionが返されること() {
+    //非変換項目
+    String fullName = "山田";
+    String email = "yamada@example.com";
+    String region = "東京都";
+    Integer minAge = 20;
+    Integer maxAge = 30;
+    String sex = "男性";
+    String course = "Java";
+    String status = "受講中";
+
+    //変換対象項目（変換前と変換後）
+    String beforeKanaName = "やまだ";
+    String afterKanaName = "ヤマダ";
+
+    SearchCondition condition = SearchCondition.builder()
+        .fullName(fullName)
+        .kanaName(beforeKanaName)  // 正規化対象
+        .email(email)
+        .region(region)
+        .minAge(minAge)
+        .maxAge(maxAge)
+        .sex(sex)
+        .course(course)
+        .status(status)
+        .build();
+
+    SearchCondition expected = SearchCondition.builder()
+        .fullName(fullName)
+        .kanaName(afterKanaName) // 正規化済み
+        .email(email)
+        .region(region)
+        .minAge(minAge)
+        .maxAge(maxAge)
+        .sex(sex)
+        .course(course)
+        .status(status)
+        .build();
+
+    when(formatter.kanaNameFormatter(condition.getKanaName())).thenReturn(afterKanaName);
+
+    SearchCondition actual = sut.SearchConditionFormatter(condition);
+
+    verify(formatter, times(1)).kanaNameFormatter(beforeKanaName);
+    assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
   }
 
   //受講生個人検索：正常系:studentに紐づくコース情報あり

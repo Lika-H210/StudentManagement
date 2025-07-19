@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import raisetech.StudentManagement.data.CourseStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.condition.SearchCondition;
 
 /**
  * 受講生情報および受講コース情報及びコース申込ステータスに関するDBアクセス処理を定義するリポジトリインターフェースです。
@@ -15,25 +16,28 @@ import raisetech.StudentManagement.data.StudentCourse;
 public interface StudentRepository {
 
   /**
-   * 全受講生の情報を取得します。(但し、キャンセル扱い(isDeleted=true)の受講生は除きます）
+   * 検索条件に合致する受講生の情報を取得します。(但し、キャンセル扱い(isDeleted=true)の受講生は除きます）
    *
+   * @param condition 検索条件
    * @return 受講生情報（Student）のリスト
    */
-  List<Student> searchStudentList();
+  List<Student> searchStudentList(SearchCondition condition);
 
   /**
-   * 全受講生の全受講コース情報を取得します。
+   * 検索条件に合致する受講コース情報を取得します。
    *
+   * @param condition 検索条件
    * @return 受講コース情報（StudentCourse）のリスト
    */
-  List<StudentCourse> searchStudentCourseList();
+  List<StudentCourse> searchStudentCourseList(SearchCondition condition);
 
   /**
-   * 全コース申込ステータス情報を取得します。
+   * 検索条件に合致するコース申込ステータス情報を取得します。
    *
+   * @param condition 検索条件
    * @return コース申込スタータス情報（CourseStatus）のリスト
    */
-  List<CourseStatus> searchCourseStatusList();
+  List<CourseStatus> searchCourseStatusList(SearchCondition condition);
 
   /**
    * publicIdに対応した受講生情報を取得します。
