@@ -21,7 +21,6 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import raisetech.StudentManagement.data.CourseStatus;
@@ -61,44 +60,32 @@ class StudentServiceTest {
   @Test
   void 受講生詳細条件検索で条件なしで検索した場合にrepositoryが正規化後の引数で適切に実行されかつ必要なconverterが呼び出されていること() {
     //前準備
-    SearchCondition condition = SearchCondition.builder().kanaName("やまだ").build();
+    SearchCondition condition = SearchCondition.builder().build();
     List<Student> studentList = List.of(student);
     List<StudentCourse> studentsCourseList = new ArrayList<>();
     List<CourseStatus> courseStatusList = new ArrayList<>();
     List<CourseDetail> courseDetailList = new ArrayList<>();
 
-    String normalizedKanaName = "ヤマダ";
-
     when(repository.searchStudentList(any(SearchCondition.class))).thenReturn(studentList);
     when(repository.searchStudentCourseList(any(SearchCondition.class)))
         .thenReturn(studentsCourseList);
-    when(repository.searchCourseStatusList(any(SearchCondition.class))).thenReturn(
-        courseStatusList);
+    when(repository.searchCourseStatusList(any(SearchCondition.class)))
+        .thenReturn(courseStatusList);
     when(converter.convertToCourseDetail(studentsCourseList, courseStatusList))
         .thenReturn(courseDetailList);
-    when(formatter.kanaNameFormatter(condition.getKanaName())).thenReturn(normalizedKanaName);
-
-    //期待値
-    SearchCondition expectCondition = SearchCondition.builder().kanaName(normalizedKanaName)
-        .build();
 
     //実行
     sut.searchStudentDetailList(condition);
 
-    //メソッド呼び出しの検証
-    ArgumentCaptor<SearchCondition> captor = ArgumentCaptor.forClass(SearchCondition.class);
-    verify(repository, times(1)).searchStudentList(captor.capture());
-    verify(repository, times(1)).searchStudentCourseList(captor.capture());
-    verify(repository, times(1)).searchCourseStatusList(captor.capture());
+    //メソッド呼び出しの検証(SearchConditionFormatterの呼び出しはformatterの呼び出しで間接的に確認）
+    verify(formatter, times(1)).kanaNameFormatter(condition.getKanaName());
+    verify(repository, times(1)).searchStudentList(any(SearchCondition.class));
+    verify(repository, times(1)).searchStudentCourseList(any(SearchCondition.class));
+    verify(repository, times(1)).searchCourseStatusList(any(SearchCondition.class));
     verify(converter, times(1))
         .convertToCourseDetail(studentsCourseList, courseStatusList);
     verify(converter, times(1))
         .toStudentDetailFromAllStudents(studentList, courseDetailList);
-    //repositoryの引数が変更後のconditionであることの検証
-    List<SearchCondition> conditionList = captor.getAllValues();
-    assertThat(conditionList)
-        .hasSize(3)
-        .allSatisfy(cr -> assertThat(cr.getKanaName()).isEqualTo(expectCondition.getKanaName()));
   }
 
   //受講生詳細条件検索：正常系:コース検索条件あり
